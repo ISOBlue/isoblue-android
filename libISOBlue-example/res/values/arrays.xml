@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="pgn_names">
+        <item>Electronic Engine Controller 1</item>
+        <item>Electronic Engine Controller 2</item>
+        <item>Fuel Economy (Liquid)</item>
+    </string-array>
+    <integer-array
+        name="pgn_vals">
+        <item>61444</item>
+        <item>61443</item>
+        <item>65266</item>
+    </integer-array>
+</resources>
