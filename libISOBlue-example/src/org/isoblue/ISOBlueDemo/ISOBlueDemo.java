@@ -216,13 +216,11 @@ public class ISOBlueDemo extends Activity {
 			case MESSAGE_READ_ENG:
 				String engMessage = ((org.isoblue.isobus.Message) msg.obj)
 						.toString();
-				Log.d(TAG, engMessage);
 				mEngArrayAdapter.add(engMessage);
 				break;
 			case MESSAGE_READ_IMP:
 				String impMessage = ((org.isoblue.isobus.Message) msg.obj)
 						.toString();
-				Log.d(TAG, impMessage);
 				mImpArrayAdapter.add(impMessage);
 				break;
 			case MESSAGE_DEVICE_NAME:
