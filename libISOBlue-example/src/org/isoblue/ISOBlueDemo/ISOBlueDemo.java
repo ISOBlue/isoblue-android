@@ -24,7 +24,11 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.DatabaseUtils.InsertHelper;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -78,6 +82,9 @@ public class ISOBlueDemo extends Activity {
 	FragmentManager fm;
 	PGNDialogFragment PGNDialog;
 
+	private SQLiteOpenHelper mHelper;
+	private SQLiteDatabase mDatabase;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -99,6 +106,10 @@ public class ISOBlueDemo extends Activity {
 			finish();
 			return;
 		}
+
+		mHelper = new ISOBUSOpenHelper(this.getApplicationContext());
+		mDatabase = mHelper.getWritableDatabase();
+		//mDatabase.beginTransaction();
 	}
 
 	@Override
@@ -158,6 +169,10 @@ public class ISOBlueDemo extends Activity {
 		// Stop the Bluetooth chat services
 		if (mChatService != null)
 			mChatService.stop();
+
+		//mDatabase.setTransactionSuccessful();
+		//mDatabase.endTransaction();
+		mHelper.close();
 	}
 
 	/**
@@ -196,6 +211,9 @@ public class ISOBlueDemo extends Activity {
 	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+			org.isoblue.isobus.Message m;
+			ContentValues values;
+
 			switch (msg.what) {
 			case MESSAGE_STATE_CHANGE:
 				switch (msg.arg1) {
@@ -214,14 +232,28 @@ public class ISOBlueDemo extends Activity {
 				}
 				break;
 			case MESSAGE_READ_ENG:
-				String engMessage = ((org.isoblue.isobus.Message) msg.obj)
-						.toString();
-				mEngArrayAdapter.add(engMessage);
+				m = (org.isoblue.isobus.Message) msg.obj;
+				values = new ContentValues();
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
+				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
+				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
+				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());
+				values.put(ISOBUSOpenHelper.COLUMN_BUS, "engine");
+				values.put(ISOBUSOpenHelper.COLUMN_TIME, m.getTimeStamp());
+				mDatabase.insert(ISOBUSOpenHelper.TABLE_MESSAGES, null, values);
+				mEngArrayAdapter.add(m.toString());
 				break;
 			case MESSAGE_READ_IMP:
-				String impMessage = ((org.isoblue.isobus.Message) msg.obj)
-						.toString();
-				mImpArrayAdapter.add(impMessage);
+				m = (org.isoblue.isobus.Message) msg.obj;
+				values = new ContentValues();
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
+				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
+				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
+				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());
+				values.put(ISOBUSOpenHelper.COLUMN_BUS, "implement");
+				values.put(ISOBUSOpenHelper.COLUMN_TIME, m.getTimeStamp());
+				mDatabase.insert(ISOBUSOpenHelper.TABLE_MESSAGES, null, values);
+				mImpArrayAdapter.add(m.toString());
 				break;
 			case MESSAGE_DEVICE_NAME:
 				// save the connected device's name
@@ -299,7 +331,7 @@ public class ISOBlueDemo extends Activity {
 			return true;
 
 		case R.id.select_pgns:
-			PGNDialog.show(fm, "pgn_dialog");
+			// PGNDialog.show(fm, "pgn_dialog");
 			return true;
 		}
 		return false;
