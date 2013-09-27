@@ -1,14 +1,11 @@
 package org.isoblue.isoblue;
 
 import java.util.Collection;
-import java.util.Scanner;
 
 import org.isoblue.isobus.Bus;
 import org.isoblue.isobus.ISOBUSSocket;
 import org.isoblue.isobus.Message;
 import org.isoblue.isobus.PGN;
-
-import android.util.Log;
 
 public class ISOBlueBus extends Bus {
 
@@ -68,8 +65,8 @@ public class ISOBlueBus extends Bus {
 		switch (cmd.getOpCode()) {
 		case MESG:
 			// TODO: Support multiple sockets per bus?
-			Scanner s;
 			Message message;
+			String tokens[];
 			// int sock;
 			short saddr;
 			short daddr;
@@ -78,25 +75,20 @@ public class ISOBlueBus extends Bus {
 			int len;
 			byte data[];
 
-			Log.d("IBBUS", "bus:" + getType());
 
-			String str;
-			str = new String(cmd.getData());
-			Log.d("IBBUS", "data:\"" + str + "\"");
-			s = new Scanner(str);
+			tokens = (new String(cmd.getData())).split(" ");
 
 			// sock = s.nextInt();
-			pgn = new PGN(s.nextInt());
-			len = s.nextInt();
+			pgn = new PGN(Integer.parseInt(tokens[0]));
+			len = Integer.parseInt(tokens[1]);
 			data = new byte[len];
 			for (int i = 0; i < len; i++) {
-				data[i] = (byte) s.nextInt(16);
+				data[i] = (byte) Integer.parseInt(tokens[2+i], 16);
 			}
-			timestamp = (long) (s.nextDouble() * 1000000);
-			Log.d("IBBUS", "timestamp:" + timestamp);
-			saddr = s.nextShort(16);
-			Log.d("IBBUS", "saddr:" + saddr);
-			daddr = s.nextShort(16);
+			timestamp = (long) (Double.parseDouble(tokens[len+2]) * 1000000);
+			saddr = Short.parseShort(tokens[len+3], 16);
+			daddr = Short.parseShort(tokens[len+4], 16);
+			//Log.d("IBBUS", "bus:" + getType() + " data:\"" + str + "\" timestamp:" + timestamp + " saddr:" + saddr + " daddr:" + daddr);
 
 			message = new Message(daddr, saddr, pgn, data, timestamp);
 

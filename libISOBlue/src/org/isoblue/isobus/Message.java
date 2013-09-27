@@ -64,14 +64,28 @@ public class Message {
 	 */
 	@Override
 	public String toString() {
-		String str;
+		StringBuilder s = new StringBuilder();
 
-		str = "PGN:" + mPgn.toString() + " SA:" + mSrcAddr + " DA:" + mDestAddr
-				+ " Data:";
+		s.append("PGN:").append(mPgn);
+		s.append(" SA:").append(mSrcAddr);
+		s.append(" DA:").append(mDestAddr);
+
+		s.append(" Data:");
 		for (byte b : mData) {
-			str += String.format("%02x", b);
+			int val;
+
+			// Put byte's value into and int, treating byte as unsigned
+			val = b & 0x7f;
+			val += (b & 0x80);
+			s.append(" ");
+
+			if (val < 0x10)
+				s.append("0");
+			s.append(Integer.toString(val, 16));
 		}
 
-		return str;
+		s.append(" Time: ").append(mTimeStamp);
+
+		return s.toString();
 	}
 }
