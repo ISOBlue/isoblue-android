@@ -1,10 +1,10 @@
 package org.isoblue.isoblue;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -23,7 +23,7 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 	private static final byte[] MY_PIN = { '0', '0', '0', '0' };
 
 	private BluetoothDevice mDevice;
-	private BluetoothSocket mSocket;
+	private volatile BluetoothSocket mSocket;
 	private ISOBlueBus mEngineBus, mImplementBus;
 	private Thread mReadThread, mWriteThread;
 	private BlockingQueue<ISOBlueCommand> mOutCommands;
@@ -52,7 +52,7 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		mSocket = mDevice.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+		mSocket = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
 		mSocket.connect();
 
 		mReadThread = new ReadThread();
@@ -72,10 +72,11 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 		mSocket = null;
 		while (mSocket == null) {
 			try {
-				mSocket = mDevice
-						.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+				mSocket = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
 				mSocket.connect();
 			} catch (IOException e) {
+				mSocket = null;
+
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				android.os.SystemClock.sleep(100);
@@ -101,10 +102,11 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 
 	private class ReadThread extends Thread {
 
-		private Scanner mScanner;
+		private BufferedReader mReader;
 
 		private ReadThread() throws IOException {
-			mScanner = new Scanner(mSocket.getInputStream());
+			mReader = new BufferedReader(new InputStreamReader(
+					mSocket.getInputStream()));
 		}
 
 		/*
@@ -114,12 +116,25 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 		 */
 		@Override
 		public void run() {
-			ISOBlueCommand cmd;
 
 			while (true) {
 				while (true) {
+					String line;
+					ISOBlueCommand cmd;
+
+					// Receive the command
 					try {
-						cmd = ISOBlueCommand.receiveCommand(mScanner);
+						line = mReader.readLine();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						break;
+					}
+					Log.d("CMD", line);
+
+					// Parse the command
+					try {
+						cmd = ISOBlueCommand.receiveCommand(line);
 
 						switch (cmd.getBus()) {
 						case 0:
@@ -130,26 +145,22 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 							mImplementBus.handleCommand(cmd);
 							break;
 						}
-					} catch (NoSuchElementException e) {
+					} catch (IllegalArgumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						reconnectSocket();
-						mWriteThread.interrupt();
-						break;
-					} catch (NullPointerException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						reconnectSocket();
-						mWriteThread.interrupt();
-						break;
+						continue;
 					}
 				}
 
-				try {
-					mScanner = new Scanner(mSocket.getInputStream());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				synchronized (mSocket) {
+					try {
+						reconnectSocket();
+						mReader = new BufferedReader(new InputStreamReader(
+								mSocket.getInputStream()));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -193,11 +204,13 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 					}
 				}
 
-				try {
-					mOut = mSocket.getOutputStream();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				synchronized (mSocket) {
+					try {
+						mOut = mSocket.getOutputStream();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}

@@ -2,7 +2,6 @@ package org.isoblue.isoblue;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Scanner;
 
 public class ISOBlueCommand {
 
@@ -15,18 +14,19 @@ public class ISOBlueCommand {
 	private short mSock;
 	private byte mData[];
 
-	public static ISOBlueCommand receiveCommand(Scanner s) {
+	public static ISOBlueCommand receiveCommand(String line) {
+		String[] tokens;
 		OpCode opCode = OpCode.MESG;
 		short bus;
 		short sock;
 		String data;
 
+		tokens = line.split(" ", 2);
 		/* TODO: Parse Opcodes */
-		sock = bus = s.nextShort();
-		data = s.nextLine();
+		sock = bus = Short.parseShort(tokens[0]);
+		data = tokens[1];
 
-		return new ISOBlueCommand(opCode, bus, sock, data.substring(0,
-				data.length() - 1).getBytes());
+		return new ISOBlueCommand(opCode, bus, sock, data.getBytes());
 	}
 
 	public void sendCommand(OutputStream os) throws IOException {
@@ -53,25 +53,27 @@ public class ISOBlueCommand {
 	 */
 	@Override
 	public String toString() {
-		String str;
+		StringBuilder s;
+		
+		s = new StringBuilder();
 
 		switch (this.mOpCode) {
 		case FILT:
-			str = "F";
+			s.append("F");
 			break;
 
 		case WRITE:
-			str = "W";
+			s.append("W");
 			break;
 
 		default:
-			str = "";
 			break;
 		}
 
-		str += " " + this.mBus + " " + new String(this.mData);
+		s.append(" ").append(this.mBus);
+		s.append(" ").append(new String(this.mData));
 
-		return str;
+		return s.toString();
 	}
 
 	/**
