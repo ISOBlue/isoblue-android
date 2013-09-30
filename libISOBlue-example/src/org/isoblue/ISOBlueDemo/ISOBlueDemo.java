@@ -26,7 +26,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
@@ -109,7 +108,6 @@ public class ISOBlueDemo extends Activity {
 
 		mHelper = new ISOBUSOpenHelper(this.getApplicationContext());
 		mDatabase = mHelper.getWritableDatabase();
-		//mDatabase.beginTransaction();
 	}
 
 	@Override
@@ -126,6 +124,8 @@ public class ISOBlueDemo extends Activity {
 			if (mChatService == null)
 				setupChat();
 		}
+
+		mDatabase.beginTransaction();
 	}
 
 	@Override
@@ -164,14 +164,20 @@ public class ISOBlueDemo extends Activity {
 	}
 
 	@Override
+	public void onStop() {
+		super.onStop();
+
+		mDatabase.setTransactionSuccessful();
+		mDatabase.endTransaction();
+	}
+
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		// Stop the Bluetooth chat services
 		if (mChatService != null)
 			mChatService.stop();
 
-		//mDatabase.setTransactionSuccessful();
-		//mDatabase.endTransaction();
 		mHelper.close();
 	}
 
