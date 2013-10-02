@@ -79,7 +79,7 @@ public class ISOBlueDemo extends Activity {
 	private BluetoothService mChatService = null;
 
 	FragmentManager fm;
-	PGNDialogFragment PGNDialog;
+	protected static PGNDialogFragment PGNDialog;
 
 	private SQLiteOpenHelper mHelper;
 	private SQLiteDatabase mDatabase;
@@ -337,14 +337,9 @@ public class ISOBlueDemo extends Activity {
 			return true;
 
 		case R.id.select_pgns:
-			// PGNDialog.show(fm, "pgn_dialog");
+			PGNDialog.show(fm, "pgn_dialog");
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 	}
 }

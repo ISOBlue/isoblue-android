@@ -1,6 +1,9 @@
 package org.isoblue.ISOBlueDemo;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.isoblue.isobus.PGN;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,10 +14,10 @@ import android.os.Bundle;
 
 public class PGNDialogFragment extends DialogFragment {
 
-	private TypedArray PGNVals;
-	private ArrayList<Integer> mSelectedPGNs;
+	private TypedArray mPGNVals;
+	private final Set<PGN> mSelectedPGNs = new HashSet<PGN>();
 	
-	public ArrayList<Integer> getPGNs() {
+	public Set<PGN> getPGNs() {
 		return mSelectedPGNs;
 	}
 
@@ -22,17 +25,16 @@ public class PGNDialogFragment extends DialogFragment {
 	public void onDismiss(DialogInterface dialog) {
 		super.onDismiss(dialog);
 		
-		PGNVals.recycle();
+		mPGNVals.recycle();
 	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		PGNVals = getResources().obtainTypedArray(R.array.pgn_vals);
-		mSelectedPGNs = getArguments().getIntegerArrayList("pgns");
+		mPGNVals = getResources().obtainTypedArray(R.array.pgn_vals);
 		
-		boolean checked[] = new boolean[PGNVals.length()];
-		for(int i = 0; i < PGNVals.length(); i++) {
-			checked[i] = mSelectedPGNs.contains(PGNVals.getInteger(i, -1));
+		boolean checked[] = new boolean[mPGNVals.length()];
+		for(int i = 0; i < mPGNVals.length(); i++) {
+			checked[i] = mSelectedPGNs.contains(new PGN(mPGNVals.getInteger(i, -1)));
 		}
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -47,7 +49,7 @@ public class PGNDialogFragment extends DialogFragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which, boolean isChecked) {
-								Integer val = PGNVals.getInteger(which, -1);
+								PGN val = new PGN(mPGNVals.getInteger(which, -1));
 								if (isChecked) {
 									// If the user checked the item, add it to
 									// the selected items
@@ -55,7 +57,7 @@ public class PGNDialogFragment extends DialogFragment {
 								} else if (mSelectedPGNs.contains(val)) {
 									// Else, if the item is already in the
 									// array, remove it
-									mSelectedPGNs.remove(Integer.valueOf(val));
+									mSelectedPGNs.remove(val);
 								}
 							}
 						});
