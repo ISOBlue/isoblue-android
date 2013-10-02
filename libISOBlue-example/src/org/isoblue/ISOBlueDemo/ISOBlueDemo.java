@@ -240,7 +240,7 @@ public class ISOBlueDemo extends Activity {
 			case MESSAGE_READ_ENG:
 				m = (org.isoblue.isobus.Message) msg.obj;
 				values = new ContentValues();
-				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().getValue());
 				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
 				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
 				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());
@@ -252,7 +252,7 @@ public class ISOBlueDemo extends Activity {
 			case MESSAGE_READ_IMP:
 				m = (org.isoblue.isobus.Message) msg.obj;
 				values = new ContentValues();
-				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().getValue());
 				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
 				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
 				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());

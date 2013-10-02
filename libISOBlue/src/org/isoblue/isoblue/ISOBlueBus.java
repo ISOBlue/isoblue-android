@@ -47,7 +47,7 @@ public class ISOBlueBus extends Bus {
 
 		str = Integer.toString(pgns.size());
 		for (PGN pgn : pgns) {
-			str += " " + pgn.asInt();
+			str += " " + pgn.getValue();
 		}
 
 		cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, bus, (short) 0,
@@ -122,7 +122,7 @@ public class ISOBlueBus extends Bus {
 			break;
 		}
 
-		str = message.getDestAddr() + " " + message.getPgn().asInt() + " "
+		str = message.getDestAddr() + " " + message.getPgn().getValue() + " "
 				+ message.getData().length;
 		for (byte b : message.getData()) {
 			str += " " + String.format("%02x", b);
