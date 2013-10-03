@@ -145,7 +145,7 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 							mImplementBus.handleCommand(cmd);
 							break;
 						}
-					} catch (IllegalArgumentException e) {
+					} catch (RuntimeException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						continue;
