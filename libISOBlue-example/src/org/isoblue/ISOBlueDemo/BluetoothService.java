@@ -17,9 +17,7 @@
 package org.isoblue.ISOBlueDemo;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 
 import org.isoblue.isoblue.ISOBlueDevice;
 import org.isoblue.isobus.ISOBUSSocket;
@@ -42,11 +40,6 @@ import android.util.Log;
 public class BluetoothService {
 	// Debugging
 	private static final String TAG = "BluetoothService";
-
-	// UUID for this application
-	// TODO: Give ISOBlue its own UUID instead of using the SPP one
-	private static final UUID MY_UUID = UUID
-			.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
 	// Member fields
 	private final BluetoothAdapter mAdapter;
@@ -292,10 +285,10 @@ public class BluetoothService {
 			try {
 				// This is a blocking call and will only return on a
 				// successful connection or an exception
-				List<PGN> pgns = new ArrayList<PGN>();
+				Set<PGN> pgns = ISOBlueDemo.PGNDialog.getPGNs();
 
-				pgns.add(new PGN(0));
-				pgns.add(new PGN(0x00FF00));
+				//pgns.add(new PGN(0));
+				//pgns.add(new PGN(0x00FF00));
 
 				mmEngSocket = new ISOBUSSocket(mmDevice.getEngineBus(), null,
 						pgns);
