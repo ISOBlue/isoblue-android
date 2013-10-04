@@ -26,7 +26,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.DatabaseUtils.InsertHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
@@ -80,7 +79,7 @@ public class ISOBlueDemo extends Activity {
 	private BluetoothService mChatService = null;
 
 	FragmentManager fm;
-	PGNDialogFragment PGNDialog;
+	protected static PGNDialogFragment PGNDialog;
 
 	private SQLiteOpenHelper mHelper;
 	private SQLiteDatabase mDatabase;
@@ -109,7 +108,6 @@ public class ISOBlueDemo extends Activity {
 
 		mHelper = new ISOBUSOpenHelper(this.getApplicationContext());
 		mDatabase = mHelper.getWritableDatabase();
-		//mDatabase.beginTransaction();
 	}
 
 	@Override
@@ -126,6 +124,8 @@ public class ISOBlueDemo extends Activity {
 			if (mChatService == null)
 				setupChat();
 		}
+
+		mDatabase.beginTransaction();
 	}
 
 	@Override
@@ -164,14 +164,20 @@ public class ISOBlueDemo extends Activity {
 	}
 
 	@Override
+	public void onStop() {
+		super.onStop();
+
+		mDatabase.setTransactionSuccessful();
+		mDatabase.endTransaction();
+	}
+
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		// Stop the Bluetooth chat services
 		if (mChatService != null)
 			mChatService.stop();
 
-		//mDatabase.setTransactionSuccessful();
-		//mDatabase.endTransaction();
 		mHelper.close();
 	}
 
@@ -234,7 +240,7 @@ public class ISOBlueDemo extends Activity {
 			case MESSAGE_READ_ENG:
 				m = (org.isoblue.isobus.Message) msg.obj;
 				values = new ContentValues();
-				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().getValue());
 				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
 				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
 				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());
@@ -246,7 +252,7 @@ public class ISOBlueDemo extends Activity {
 			case MESSAGE_READ_IMP:
 				m = (org.isoblue.isobus.Message) msg.obj;
 				values = new ContentValues();
-				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().getValue());
 				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
 				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
 				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());
@@ -331,14 +337,9 @@ public class ISOBlueDemo extends Activity {
 			return true;
 
 		case R.id.select_pgns:
-			// PGNDialog.show(fm, "pgn_dialog");
+			PGNDialog.show(fm, "pgn_dialog");
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 	}
 }
