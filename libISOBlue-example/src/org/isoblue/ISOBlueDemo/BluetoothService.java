@@ -148,8 +148,14 @@ public class BluetoothService {
 		}
 
 		// Start the thread to connect with the given device
+		try {
 		mConnectThread = new ConnectThread(device);
 		mConnectThread.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+			connectionFailed();
+			setState(STATE_NONE);
+		}
 		setState(STATE_CONNECTING);
 	}
 
