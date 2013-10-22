@@ -1,5 +1,5 @@
 /*
- * Author: Alex Layton <awlayton@purdue.edu>
+ * Author: Alex Layton <alex@layton.in>
  *
  * Copyright (c) 2013 Purdue University
  *
@@ -29,6 +29,10 @@ public class Message {
 	private final short mSrcAddr, mDestAddr;
 	private final PGN mPgn;
 	private final byte mData[];
+
+	/**
+	 * Times since the epoch, in microseconds
+	 */
 	private final long mTimeStamp;
 
 	public Message(short destAddr, PGN pgn, byte data[]) {

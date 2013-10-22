@@ -1,5 +1,5 @@
 /*
- * Author: Alex Layton <awlayton@purdue.edu>
+ * Author: Alex Layton <alex@layton.in>
  *
  * Copyright (c) 2013 Purdue University
  *
@@ -24,6 +24,7 @@
 package org.isoblue.isoblue;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.isoblue.isobus.Bus;
 import org.isoblue.isobus.ISOBUSSocket;
@@ -45,10 +46,10 @@ public class ISOBlueBus extends Bus {
 	 */
 	@Override
 	protected void attach(ISOBUSSocket sock) throws InterruptedException {
-		Collection<PGN> pgns;
+		Set<PGN> pgns;
 		ISOBlueCommand cmd;
 		short bus;
-		String str;
+		StringBuilder s = new StringBuilder();
 
 		super.attach(sock);
 
@@ -68,13 +69,13 @@ public class ISOBlueBus extends Bus {
 			break;
 		}
 
-		str = Integer.toString(pgns.size());
+		s.append(String.format("%5x", pgns.size()));
 		for (PGN pgn : pgns) {
-			str += " " + pgn.getValue();
+			s.append(String.format("%5x", pgn.getValue()));
 		}
 
 		cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, bus, (short) 0,
-				str.getBytes());
+				s.toString().getBytes());
 
 		((ISOBlueDevice) super.getNetwork()).sendCommand(cmd);
 	}
@@ -89,7 +90,6 @@ public class ISOBlueBus extends Bus {
 		case MESG:
 			// TODO: Support multiple sockets per bus?
 			Message message;
-			String tokens[];
 			// int sock;
 			short saddr;
 			short daddr;
@@ -97,20 +97,22 @@ public class ISOBlueBus extends Bus {
 			long timestamp;
 			int len;
 			byte data[];
+			String cmdData;
 
+			cmdData = new String(cmd.getData());
 
-			tokens = (new String(cmd.getData())).split(" ");
-
-			// sock = s.nextInt();
-			pgn = new PGN(Integer.parseInt(tokens[0]));
-			len = Integer.parseInt(tokens[1]);
+			pgn = new PGN(Integer.parseInt(cmdData.substring(0, 5), 16));
+			daddr = Short.parseShort(cmdData.substring(5, 7), 16);
+			len = Integer.parseInt(cmdData.substring(7, 11), 16);
 			data = new byte[len];
+			int curs = 11;
 			for (int i = 0; i < len; i++) {
-				data[i] = (byte) Integer.parseInt(tokens[2+i], 16);
+				data[i] = (byte) Integer.parseInt(cmdData.substring(curs, curs + 2), 16);
+				curs += 2;
 			}
-			timestamp = (long) (Double.parseDouble(tokens[len+2]) * 1000000);
-			saddr = Short.parseShort(tokens[len+3], 16);
-			daddr = Short.parseShort(tokens[len+4], 16);
+			timestamp = Long.parseLong(cmdData.substring(curs, curs + 8), 16) * 1000000
+					+ Integer.parseInt(cmdData.substring(curs + 8, curs + 13), 16);
+			saddr = Short.parseShort(cmdData.substring(curs + 13, curs + 15), 16);
 			//Log.d("IBBUS", "bus:" + getType() + " data:\"" + str + "\" timestamp:" + timestamp + " saddr:" + saddr + " daddr:" + daddr);
 
 			message = new Message(daddr, saddr, pgn, data, timestamp);
@@ -129,7 +131,8 @@ public class ISOBlueBus extends Bus {
 	protected void passMessageOut(Message message) throws InterruptedException {
 		ISOBlueCommand cmd;
 		short bus;
-		String str;
+		byte data[];
+		StringBuilder s = new StringBuilder();
 
 		switch (super.getType()) {
 		case ENGINE:
@@ -145,14 +148,14 @@ public class ISOBlueBus extends Bus {
 			break;
 		}
 
-		str = message.getDestAddr() + " " + message.getPgn().getValue() + " "
-				+ message.getData().length;
+		data = message.getData();
+		s.append(String.format("%5x%2x%4x", message.getPgn().getValue(), message.getDestAddr(), data.length));
 		for (byte b : message.getData()) {
-			str += " " + String.format("%02x", b);
+			s.append(String.format("%02x", b));
 		}
 
 		cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.WRITE, (short) 0, bus,
-				str.getBytes());
+				s.toString().getBytes());
 		((ISOBlueDevice) super.getNetwork()).sendCommand(cmd);
 	}
 }

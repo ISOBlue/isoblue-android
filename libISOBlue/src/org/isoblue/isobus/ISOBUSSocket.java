@@ -1,5 +1,5 @@
 /*
- * Author: Alex Layton <awlayton@purdue.edu>
+ * Author: Alex Layton <alex@layton.in>
  *
  * Copyright (c) 2013 Purdue University
  *
@@ -82,7 +82,7 @@ public class ISOBUSSocket implements Closeable {
 	/**
 	 * @return the mPgns
 	 */
-	public Collection<PGN> getPgns() {
+	public Set<PGN> getPgns() {
 		return mPgns;
 	}
 }
