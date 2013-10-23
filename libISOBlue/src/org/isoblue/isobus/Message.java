@@ -23,96 +23,241 @@
 
 package org.isoblue.isobus;
 
-public class Message {
+import java.io.Serializable;
+import java.util.Arrays;
 
-	// private final NAME mSrcName, mDestName;
-	private final short mSrcAddr, mDestAddr;
-	private final PGN mPgn;
-	private final byte mData[];
+/**
+ * Represents an ISOBUS message. Messages are the datagrams which are
+ * sent/received on the ISOBUS network, using {@link ISOBUSSocket#read()} and
+ * {@link ISOBUSSocket#write(Message)} respectively.
+ * 
+ * @see ISOBUSSocket
+ * @author Alex Layton <alex@layton.in>
+ */
+public final class Message implements Serializable {
 
-	/**
-	 * Times since the epoch, in microseconds
-	 */
-	private final long mTimeStamp;
+    private static final long serialVersionUID = -6647787001098942451L;
 
-	public Message(short destAddr, PGN pgn, byte data[]) {
-		this(destAddr, (short) -1, pgn, data, -1);
-	}
+    // TODO: Use NAMEs instead of addresses for source/destination
+    /**
+     * ISOBUS NAME of the destination of this {@link Message}.
+     * 
+     * @see NAME
+     */
+    // private final NAME mDestName;
+    /**
+     * ISOBUS NAME of the destination of this {@link Message}.
+     * 
+     * @see NAME
+     */
+    // private final NAME mSrcName;
 
-	public Message(short destAddr, short srcAddr, PGN pgn, byte data[],
-			long timeStamp) {
-		// TODO: Use NAMEs instead of addresses for source/destination
-		mDestAddr = destAddr;
-		mSrcAddr = srcAddr;
-		mPgn = pgn;
-		mData = data;
-		mTimeStamp = timeStamp;
-	}
+    /**
+     * ISOBUS address of the destination of this {@link Message}.
+     */
+    private final short mDestAddr;
 
-	/**
-	 * @return the mSrcAddr
-	 */
-	public short getSrcAddr() {
-		return mSrcAddr;
-	}
+    /**
+     * ISOBUS address of the source of this {@link Message}.
+     */
+    private final short mSrcAddr;
 
-	/**
-	 * @return the mDestAddr
-	 */
-	public short getDestAddr() {
-		return mDestAddr;
-	}
+    /**
+     * {@link PGN} corresponding to the data of this {@link Message}. It is
+     * needed to know how to interpret the {@code bytes} in {@link #mData}.
+     */
+    private final PGN mPgn;
 
-	/**
-	 * @return the mPgn
-	 */
-	public PGN getPgn() {
-		return mPgn;
-	}
+    /**
+     * Bytes of the contained data. The meaning of these bytes is determined by
+     * {@link #mPgn}.
+     */
+    private final byte mData[];
 
-	/**
-	 * @return the mData
-	 */
-	public byte[] getData() {
-		return mData;
-	}
+    /**
+     * Time when this {@link Message} was received, in &micros since the epoch.
+     */
+    private final long mTimestamp;
 
-	/**
-	 * @return the mTimeStamp
-	 */
-	public long getTimeStamp() {
-		return mTimeStamp;
-	}
+    /**
+     * Stores the hash code of this {@link Message} to avoid recalculating it.
+     * Initialized lazily since {@link Message} is immutable.
+     */
+    private transient int fHashCode;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder s = new StringBuilder();
+    /**
+     * Constructs a new {@link Message} with the specified destination,
+     * {@link PGN}, and data.
+     * 
+     * @param destAddr
+     *            the address of the destination
+     * @param pgn
+     *            the {@link PGN} corresponding to {@code data}, not null
+     * @param data
+     *            {@code bytes} of data, {@code null} treated as empty
+     *            {@code byte[]}
+     * 
+     * @see PGN
+     */
+    public Message(short destAddr, PGN pgn, byte data[]) {
+        this(destAddr, (short) -1, pgn, data, -1);
+    }
 
-		s.append("PGN:").append(mPgn);
-		s.append(" SA:").append(mSrcAddr);
-		s.append(" DA:").append(mDestAddr);
+    /**
+     * Constructs a new {@link Message} with the specified destination, source,
+     * {@link PGN}, data, and timestamp.
+     * 
+     * @param destAddr
+     *            the address of the destination
+     * @param srcAddr
+     *            the address of the source
+     * @param pgn
+     *            the {@link PGN} corresponding to {@code data}, not null
+     * @param data
+     *            {@code bytes} of data, {@code null} treated as empty
+     *            {@code byte[]}
+     * @param timeStamp
+     *            the arrival time of the {@link Message}, in &micros since the
+     *            epoch
+     * 
+     * @see PGN
+     */
+    protected Message(short destAddr, short srcAddr, PGN pgn, byte data[],
+            long timeStamp) {
+        if (pgn == null) {
+            throw new NullPointerException("Parameter pgn was null");
+        }
 
-		s.append(" Data:");
-		for (byte b : mData) {
-			int val;
+        mDestAddr = destAddr;
+        mSrcAddr = srcAddr;
+        mPgn = pgn;
+        // Handle data being null, and copy it so it won't change on us
+        mData = data == null ? new byte[0] : data.clone();
+        mTimestamp = timeStamp;
+    }
 
-			// Put byte's value into and int, treating byte as unsigned
-			val = b & 0x7f;
-			val += (b & 0x80);
-			s.append(" ");
+    /**
+     * Get the source address of this {@link Message}.
+     * 
+     * @return the source address
+     */
+    public short getSrcAddr() {
+        return mSrcAddr;
+    }
 
-			if (val < 0x10)
-				s.append("0");
-			s.append(Integer.toString(val, 16));
-		}
+    /**
+     * Get the destination address of this {@link Message}.
+     * 
+     * @return the source address
+     */
+    public short getDestAddr() {
+        return mDestAddr;
+    }
 
-		s.append(" Time: ").append(mTimeStamp);
+    /**
+     * Get the {@link PGN} corresponding to this {@link Message}'s data.
+     * 
+     * @return the {@link PGN}
+     */
+    public PGN getPgn() {
+        return mPgn;
+    }
 
-		return s.toString();
-	}
+    /**
+     * Get the data {@code bytes} of this {@link Message}.
+     * 
+     * @return the data {@code bytes}
+     */
+    public byte[] getData() {
+        return mData;
+    }
+
+    /**
+     * Get the timestamp of this {@link Message}, in &micros since the epoch
+     * 
+     * @return the timestamps
+     */
+    public long getTimeStamp() {
+        return mTimestamp;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+
+        s.append("PGN:").append(mPgn);
+        s.append(" SA:").append(mSrcAddr);
+        s.append(" DA:").append(mDestAddr);
+
+        s.append(" Data:");
+        for (byte b : mData) {
+            int val;
+
+            // Put byte's value into and int, treating byte as unsigned
+            val = ((int) b) & 0xff;
+
+            if (val < 0x10)
+                s.append("0");
+            s.append(Integer.toString(val, 16));
+        }
+
+        s.append(" Time: ").append(mTimestamp);
+
+        return s.toString();
+    }
+
+    /**
+     * Compares this instance with the specified object and indicates if they
+     * are equal. In order to be equal, {@code o} must be an instance of
+     * {@code Message} with the same values for its destination, source, PGN,
+     * data, and timestamp.
+     * 
+     * @param o
+     *            the object to compare this {@link PGN} with
+     * @return {@code true} if the specified object is equal to this
+     *         {@code Integer}; {@code false} otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof Message)) {
+            return false;
+        }
+
+        Message m = (Message) o;
+
+        return m.mDestAddr == this.mDestAddr && m.mSrcAddr == this.mSrcAddr
+                && m.mPgn.equals(this.mPgn) && m.mData.equals(this.mData)
+                && m.mTimestamp == this.mTimestamp;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        if (fHashCode == 0) {
+            int result = 7;
+
+            result = 31 * result + mDestAddr;
+            result = 31 * result + mSrcAddr;
+            result = 31 * result + mPgn.hashCode();
+            result = 31 * result + Arrays.hashCode(mData);
+            result = 31 * result + (int) (mTimestamp ^ (mTimestamp >>> 32));
+
+            fHashCode = result;
+        }
+
+        return fHashCode;
+    }
 }

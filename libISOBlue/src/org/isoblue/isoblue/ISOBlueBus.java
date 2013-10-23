@@ -89,7 +89,6 @@ public class ISOBlueBus extends Bus {
 		switch (cmd.getOpCode()) {
 		case MESG:
 			// TODO: Support multiple sockets per bus?
-			Message message;
 			// int sock;
 			short saddr;
 			short daddr;
@@ -115,10 +114,8 @@ public class ISOBlueBus extends Bus {
 			saddr = Short.parseShort(cmdData.substring(curs + 13, curs + 15), 16);
 			//Log.d("IBBUS", "bus:" + getType() + " data:\"" + str + "\" timestamp:" + timestamp + " saddr:" + saddr + " daddr:" + daddr);
 
-			message = new Message(daddr, saddr, pgn, data, timestamp);
-
 			for (ISOBUSSocket socket : mSocks) {
-				super.passMessageIn(socket, message);
+				super.passMessageIn(socket, daddr, saddr, pgn, data, timestamp);
 			}
 			break;
 
