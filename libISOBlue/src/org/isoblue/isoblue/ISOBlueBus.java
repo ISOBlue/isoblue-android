@@ -71,7 +71,7 @@ public class ISOBlueBus extends Bus {
 
 		s.append(String.format("%5x", pgns.size()));
 		for (PGN pgn : pgns) {
-			s.append(String.format("%5x", pgn.getValue()));
+			s.append(String.format("%5x", pgn.asInt()));
 		}
 
 		cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, bus, (short) 0,
@@ -149,7 +149,7 @@ public class ISOBlueBus extends Bus {
 		}
 
 		data = message.getData();
-		s.append(String.format("%5x%2x%4x", message.getPgn().getValue(), message.getDestAddr(), data.length));
+		s.append(String.format("%5x%2x%4x", message.getPgn().asInt(), message.getDestAddr(), data.length));
 		for (byte b : message.getData()) {
 			s.append(String.format("%02x", b));
 		}
