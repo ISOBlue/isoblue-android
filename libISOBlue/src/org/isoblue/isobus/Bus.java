@@ -51,12 +51,12 @@ public abstract class Bus {
 	protected abstract void passMessageOut(Message message)
 			throws InterruptedException;
 
-	protected void attach(ISOBUSSocket sock) throws InterruptedException {
-		mSocks.add(sock);
+	protected boolean attach(ISOBUSSocket sock) {
+		return mSocks.add(sock);
 	}
 
-	protected void detach(ISOBUSSocket sock) {
-		mSocks.remove(sock);
+	protected boolean detach(ISOBUSSocket sock) {
+		return mSocks.remove(sock);
 	}
 
 	public ISOBUSNetwork getNetwork() {

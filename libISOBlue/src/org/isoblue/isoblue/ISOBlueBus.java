@@ -45,14 +45,15 @@ public class ISOBlueBus extends Bus {
 	 * @see org.isoblue.isobus.Bus#attach(org.isoblue.isobus.ISOBUSSocket)
 	 */
 	@Override
-	protected void attach(ISOBUSSocket sock) throws InterruptedException {
+	protected boolean attach(ISOBUSSocket sock) {
 		Set<PGN> pgns;
 		ISOBlueCommand cmd;
 		short bus;
 		StringBuilder s = new StringBuilder();
 
-		super.attach(sock);
-
+		if(!super.attach(sock)) {
+		    return false;
+		}
 		pgns = sock.getPgns();
 
 		switch (super.getType()) {
@@ -77,7 +78,15 @@ public class ISOBlueBus extends Bus {
 		cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, bus, (short) 0,
 				s.toString().getBytes());
 
-		((ISOBlueDevice) super.getNetwork()).sendCommand(cmd);
+		try {
+            ((ISOBlueDevice) super.getNetwork()).sendCommand(cmd);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
+		
+		return true;
 	}
 
 	@Override
