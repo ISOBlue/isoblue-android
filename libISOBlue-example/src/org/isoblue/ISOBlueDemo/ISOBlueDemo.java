@@ -40,6 +40,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.authorwjf.AboutDialog;
+
 /**
  * This is the main Activity that displays the current chat session.
  */
@@ -339,6 +341,12 @@ public class ISOBlueDemo extends Activity {
 		case R.id.select_pgns:
 			PGNDialog.show(fm, "pgn_dialog");
 			return true;
+			
+		case R.id.about:
+            AboutDialog about = new AboutDialog(this);
+            about.setTitle(R.string.about_title);
+            about.show();
+            break;
 		}
 		return false;
 	}
