@@ -1,5 +1,5 @@
 /*
- * Author: Alex Layton <awlayton@purdue.edu>
+ * Author: Alex Layton <alex@layton.in>
  *
  * Copyright (c) 2013 Purdue University
  *
@@ -38,16 +38,14 @@ public class ISOBlueCommand {
 	private byte mData[];
 
 	public static ISOBlueCommand receiveCommand(String line) {
-		String[] tokens;
 		OpCode opCode = OpCode.MESG;
 		short bus;
 		short sock;
 		String data;
 
-		tokens = line.split(" ", 2);
 		/* TODO: Parse Opcodes */
-		sock = bus = Short.parseShort(tokens[0]);
-		data = tokens[1];
+		sock = bus = (short) Integer.parseInt(line.substring(0, 1), 16);
+		data = line.substring(1, line.length());
 
 		return new ISOBlueCommand(opCode, bus, sock, data.getBytes());
 	}
@@ -93,8 +91,8 @@ public class ISOBlueCommand {
 			break;
 		}
 
-		s.append(" ").append(this.mBus);
-		s.append(" ").append(new String(this.mData));
+		s.append(String.format("%1x", this.mBus));
+		s.append(new String(this.mData));
 
 		return s.toString();
 	}

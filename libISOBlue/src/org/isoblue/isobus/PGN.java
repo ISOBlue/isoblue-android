@@ -1,5 +1,5 @@
 /*
- * Author: Alex Layton <awlayton@purdue.edu>
+ * Author: Alex Layton <alex@layton.in>
  *
  * Copyright (c) 2013 Purdue University
  *
@@ -23,70 +23,127 @@
 
 package org.isoblue.isobus;
 
-public class PGN {
+import java.io.Serializable;
 
-	private static final int PF2_MASK = 0x00F000;
-	private static final int PS_MASK = 0x0000FF;
-	private static final int MAX_VALUE = 0x02FFFF;
-	private static final int MIN_VALUE = 0;
+/**
+ * Represents and ISOBUS Parameter Group Number (PGN). A {@link PGN} is used to
+ * identify and interpret the data within a {@link Message}.
+ * 
+ * @see Message
+ * @author Alex Layton <alex@layton.in>
+ */
+public final class PGN implements Serializable {
 
-	private final int mValue;
+    private static final long serialVersionUID = 1324435753164108638L;
 
-	public PGN(int val) throws InvalidPGNException {
-		// Check for invalid type
-		if ((val & PF2_MASK) != PF2_MASK && (val & PS_MASK) != 0)
-			throw new InvalidPGNException(val);
+    private static final int PF2_MASK = 0x00F000;
 
-		// Check for value outside allowed range
-		if (val < MIN_VALUE || val > MAX_VALUE)
-			throw new InvalidPGNException(val);
+    private static final int PS_MASK = 0x0000FF;
 
-		mValue = val;
-	}
+    /**
+     * Constant for the minimum {@code int} corresponding to a valid ISOBUS PGN
+     */
+    private static final int MAX_VALUE = 0x02FFFF;
 
-	public int getValue() {
-		return mValue;
-	}
+    /**
+     * Constant for the minimum {@code int} corresponding to a valid ISOBUS PGN
+     */
+    private static final int MIN_VALUE = 0;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return Integer.toString(mValue);
-	}
+    /**
+     * The {@code int} representation of this {@code PGN}.
+     */
+    private final int mInt;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object o) {
-		return (o instanceof PGN) && (((PGN) o).getValue() == mValue);
-	}
+    /**
+     * Construct a new {@link PGN} from the specified {@code int}
+     * representation.
+     * <p class="note">
+     * <b>Note:</b> Many {@code int} values do not correspond to valid ISOBUS
+     * PGNs.
+     * 
+     * @param intRep
+     *            the {@code int} representation
+     * @throws InvalidPGNException
+     *             if {@code intRep} does not represent a valid ISOBUS PGN
+     */
+    public PGN(int intRep) throws InvalidPGNException {
+        // Check for invalid type
+        if ((intRep & PF2_MASK) != PF2_MASK && (intRep & PS_MASK) != 0)
+            throw new InvalidPGNException(intRep);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		return mValue;
-	}
+        // Check for value outside allowed range
+        if (intRep < MIN_VALUE || intRep > MAX_VALUE)
+            throw new InvalidPGNException(intRep);
 
-	public class InvalidPGNException extends IllegalArgumentException {
+        mInt = intRep;
+    }
 
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 4667515300205962800L;
+    /**
+     * Get the {@code int} representation of this {@link PGN}.
+     * 
+     * @return the {@code int} representation
+     */
+    public int asInt() {
+        return mInt;
+    }
 
-		public InvalidPGNException(int val) {
-			super("Integer \"" + val + "\" is not a valid ISOBUS PGN value");
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "PGN:" + Integer.toString(mInt);
+    }
+
+    /**
+     * Compares this instance with the specified object and indicates if they
+     * are equal. In order to be equal, {@code o} must be an instance of
+     * {@code PGN} and have the same integer representation as this object.
+     * 
+     * @param o
+     *            the object to compare this {@link PGN} with
+     * @return {@code true} if the specified object is equal to this
+     *         {@code Integer}; {@code false} otherwise
+     */
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof PGN) && (((PGN) o).mInt == mInt);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return mInt;
+    }
+
+    /**
+     * Thrown when an {@code int} not representing a valid ISOBUS PGN is used to
+     * construct a {@link PGN}.
+     * 
+     * @author Alex Layton <alex@layton.in>
+     */
+    public final class InvalidPGNException extends IllegalArgumentException {
+
+        private static final long serialVersionUID = 4667515300205962800L;
+
+        /**
+         * Constructs a new {@link InvalidPGNException} with the current stack
+         * trace and a detail message mentioning {@code intRep}.
+         * 
+         * @param intRep
+         *            the {@code int} which does not represent a valid ISOBUS
+         *            PGN
+         */
+        private InvalidPGNException(int intRep) {
+            super("Integer \"" + intRep
+                    + "\" does not represent a valid ISOBUS PGN");
+        }
+    }
 }

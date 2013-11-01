@@ -148,8 +148,14 @@ public class BluetoothService {
 		}
 
 		// Start the thread to connect with the given device
+		try {
 		mConnectThread = new ConnectThread(device);
 		mConnectThread.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+			connectionFailed();
+			setState(STATE_NONE);
+		}
 		setState(STATE_CONNECTING);
 	}
 
@@ -294,10 +300,10 @@ public class BluetoothService {
 						pgns);
 				mmImpSocket = new ISOBUSSocket(mmDevice.getImplementBus(),
 						null, pgns);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
 			// Reset the ConnectThread because we're done
 			synchronized (BluetoothService.this) {
@@ -309,8 +315,18 @@ public class BluetoothService {
 		}
 
 		public void cancel() {
-			mmEngSocket.close();
-			mmImpSocket.close();
+			try {
+                mmEngSocket.close();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+			try {
+                mmImpSocket.close();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 		}
 	}
 
@@ -374,7 +390,12 @@ public class BluetoothService {
 		}
 
 		public void cancel() {
-			mmSocket.close();
+			try {
+                mmSocket.close();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 		}
 	}
 }

@@ -44,19 +44,19 @@ public abstract class Bus {
 
 	protected abstract Collection<ISOBUSSocket> initSocks();
 
-	protected void passMessageIn(ISOBUSSocket socket, Message message) {
-		socket.receive(message);
+	protected void passMessageIn(ISOBUSSocket socket, short daddr, short saddr, PGN pgn, byte[] data, long timestamp) {
+		socket.receive(new Message(daddr, saddr, pgn, data, timestamp));
 	}
 
 	protected abstract void passMessageOut(Message message)
 			throws InterruptedException;
 
-	protected void attach(ISOBUSSocket sock) throws InterruptedException {
-		mSocks.add(sock);
+	protected boolean attach(ISOBUSSocket sock) {
+		return mSocks.add(sock);
 	}
 
-	protected void detach(ISOBUSSocket sock) {
-		mSocks.remove(sock);
+	protected boolean detach(ISOBUSSocket sock) {
+		return mSocks.remove(sock);
 	}
 
 	public ISOBUSNetwork getNetwork() {

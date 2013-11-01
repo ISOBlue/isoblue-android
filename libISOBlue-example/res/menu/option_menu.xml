@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009 The Android Open Source Project
+<!--
+     Copyright (C) 2009 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,12 +14,20 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/insecure_connect_scan"
-          android:icon="@android:drawable/ic_menu_search"
-          android:title="@string/insecure_connect"
-          android:showAsAction="ifRoom|withText" />
-    <item android:id="@+id/select_pgns"
-          android:title="@string/select_pgns"
-          android:showAsAction="ifRoom|withText" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/insecure_connect_scan"
+        android:icon="@android:drawable/ic_menu_search"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/insecure_connect"/>
+    <item
+        android:id="@+id/select_pgns"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/select_pgns"/>
+    <item
+        android:id="@+id/about"
+        android:showAsAction="collapseActionView"
+        android:title="@string/about_button"/>
+
 </menu>

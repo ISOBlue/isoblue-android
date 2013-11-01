@@ -40,6 +40,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.authorwjf.AboutDialog;
+
 /**
  * This is the main Activity that displays the current chat session.
  */
@@ -240,7 +242,7 @@ public class ISOBlueDemo extends Activity {
 			case MESSAGE_READ_ENG:
 				m = (org.isoblue.isobus.Message) msg.obj;
 				values = new ContentValues();
-				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().getValue());
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
 				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
 				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
 				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());
@@ -252,7 +254,7 @@ public class ISOBlueDemo extends Activity {
 			case MESSAGE_READ_IMP:
 				m = (org.isoblue.isobus.Message) msg.obj;
 				values = new ContentValues();
-				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().getValue());
+				values.put(ISOBUSOpenHelper.COLUMN_PGN, m.getPgn().asInt());
 				values.put(ISOBUSOpenHelper.COLUMN_DATA, m.getData());
 				values.put(ISOBUSOpenHelper.COLUMN_SRC, m.getSrcAddr());
 				values.put(ISOBUSOpenHelper.COLUMN_DEST, m.getDestAddr());
@@ -339,6 +341,12 @@ public class ISOBlueDemo extends Activity {
 		case R.id.select_pgns:
 			PGNDialog.show(fm, "pgn_dialog");
 			return true;
+			
+		case R.id.about:
+            AboutDialog about = new AboutDialog(this);
+            about.setTitle(R.string.about_title);
+            about.show();
+            break;
 		}
 		return false;
 	}
