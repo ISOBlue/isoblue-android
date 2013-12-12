@@ -25,103 +25,118 @@ package org.isoblue.isoblue;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ISOBlueCommand {
 
-	public enum OpCode {
-		FILT, WRITE, MESG,
-	}
+    public enum OpCode {
+        FILT('F'),
+        WRITE('W'),
+        MESG('M'),
+        ACK('A');
 
-	private OpCode mOpCode;
-	private short mBus;
-	private short mSock;
-	private byte mData[];
+        public final char val;
 
-	public static ISOBlueCommand receiveCommand(String line) {
-		OpCode opCode = OpCode.MESG;
-		short bus;
-		short sock;
-		String data;
+        OpCode(char val) {
+            this.val = val;
+        }
 
-		/* TODO: Parse Opcodes */
-		sock = bus = (short) Integer.parseInt(line.substring(0, 1), 16);
-		data = line.substring(1, line.length());
+        private static final Map<Character, OpCode> valMap;
 
-		return new ISOBlueCommand(opCode, bus, sock, data.getBytes());
-	}
+        static {
+            Map<Character, OpCode> map = new HashMap<Character, OpCode>();
+            for (OpCode op : OpCode.values()) {
+                map.put(op.val, op);
+            }
 
-	public void sendCommand(OutputStream os) throws IOException {
-		os.write((this.toString() + "\n").getBytes());
-	}
+            valMap = Collections.unmodifiableMap(map);
+        }
 
-	public ISOBlueCommand(OpCode opCode) {
-		this(opCode, (short) -1, (short) -1, new byte[0]);
-	}
+        public static OpCode fromVal(char val) {
+            return valMap.get(val);
+        }
+    }
 
-	public ISOBlueCommand(OpCode opCode, short bus, short sock, byte data[]) {
-		mOpCode = opCode;
-		mBus = bus;
-		mSock = sock;
+    private OpCode mOpCode;
+    private short mBus;
+    private short mSock;
+    private byte mData[];
 
-		mData = new byte[data.length];
-		System.arraycopy(data, 0, mData, 0, data.length);
-	}
+    public static ISOBlueCommand receiveCommand(String line) {
+        OpCode opCode;
+        short bus;
+        short sock;
+        String data;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		StringBuilder s;
-		
-		s = new StringBuilder();
+        opCode = OpCode.fromVal(line.charAt(0));
+        sock = bus = (short) Integer.parseInt(line.substring(1, 2), 16);
+        data = line.substring(2, line.length());
 
-		switch (this.mOpCode) {
-		case FILT:
-			s.append("F");
-			break;
+        return new ISOBlueCommand(opCode, bus, sock, data.getBytes());
+    }
 
-		case WRITE:
-			s.append("W");
-			break;
+    public void sendCommand(OutputStream os) throws IOException {
+        os.write((this.toString() + "\n").getBytes());
+    }
 
-		default:
-			break;
-		}
+    public ISOBlueCommand(OpCode opCode) {
+        this(opCode, (short) -1, (short) -1, new byte[0]);
+    }
 
-		s.append(String.format("%1x", this.mBus));
-		s.append(new String(this.mData));
+    public ISOBlueCommand(OpCode opCode, short bus, short sock, byte data[]) {
+        mOpCode = opCode;
+        mBus = bus;
+        mSock = sock;
 
-		return s.toString();
-	}
+        mData = new byte[data.length];
+        System.arraycopy(data, 0, mData, 0, data.length);
+    }
 
-	/**
-	 * @return the mOpCode
-	 */
-	public OpCode getOpCode() {
-		return mOpCode;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder s;
 
-	/**
-	 * @return the mBus
-	 */
-	public short getBus() {
-		return mBus;
-	}
+        s = new StringBuilder();
+        
+        s.append(this.mOpCode.val);
+        s.append(String.format("%1x", this.mBus));
+        s.append(new String(this.mData));
 
-	/**
-	 * @return the mSock
-	 */
-	public short getSock() {
-		return mSock;
-	}
+        return s.toString();
+    }
 
-	/**
-	 * @return the Data
-	 */
-	public byte[] getData() {
-		return mData;
-	}
+    /**
+     * @return the mOpCode
+     */
+    public OpCode getOpCode() {
+        return mOpCode;
+    }
+
+    /**
+     * @return the mBus
+     */
+    public short getBus() {
+        return mBus;
+    }
+
+    /**
+     * @return the mSock
+     */
+    public short getSock() {
+        return mSock;
+    }
+
+    /**
+     * @return the Data
+     */
+    public byte[] getData() {
+        return mData;
+    }
 }
