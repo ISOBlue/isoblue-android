@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ISOBlueCommand {
+public final class ISOBlueCommand {
 
     public enum OpCode {
         FILT('F'),
@@ -59,10 +59,10 @@ public class ISOBlueCommand {
         }
     }
 
-    private OpCode mOpCode;
-    private short mBus;
-    private short mSock;
-    private byte mData[];
+    private final OpCode mOpCode;
+    private final short mBus;
+    private final short mSock;
+    private final byte mData[];
 
     public static ISOBlueCommand receiveCommand(String line) {
         OpCode opCode;
@@ -79,10 +79,6 @@ public class ISOBlueCommand {
 
     public void sendCommand(OutputStream os) throws IOException {
         os.write((this.toString() + "\n").getBytes());
-    }
-
-    public ISOBlueCommand(OpCode opCode) {
-        this(opCode, (short) -1, (short) -1, new byte[0]);
     }
 
     public ISOBlueCommand(OpCode opCode, short bus, short sock, byte data[]) {
