@@ -1,3 +1,2 @@
-<h3>ISOBlue Demo</h3>
 Copyright 2013 Purdue University<br>
 <b>www.isoblue.org</b>
