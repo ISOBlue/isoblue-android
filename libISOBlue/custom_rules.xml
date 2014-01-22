@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="application-custom">
+
+	<macrodef name="git" taskname="@{taskname}">
+	    <attribute name="command" />
+	    <attribute name="dir" default="" />
+	    <attribute name="property" default="" />
+	    <attribute name="taskname" default="" />
+	    <attribute name="failonerror" default="on" />
+	    <element name="args" optional="true" />
+	    <sequential>
+	        <exec executable="git" dir="@{dir}" outputproperty="@{property}" 
+	        	failifexecutionfails="@{failonerror}" failonerror="@{failonerror}">
+	            <arg value="@{command}" />
+	            <args/>
+	        </exec>
+	    </sequential>
+	</macrodef>
+	
+    <target name="-pre-build">
+    	<git command="rev-list" property="versioning.code" taskname="versioning">
+    		<args>
+	    		<arg value="HEAD" />
+	    		<arg value="--first-parent" />
+    			<arg value="--count" />
+			</args>
+		</git>
+    	<git command="describe" property="versioning.name" taskname="versioning">
+    		<args>
+	    		<arg value="--tags" />
+	    		<arg value="--dirty" />
+    			<arg value="--abbrev=7" />
+			</args>
+		</git>
+        <echo level="info" taskname="versioning">${versioning.code}, ${versioning.name}</echo>
+    	<echo file="res/values/git_version.xml" append="false">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+			&lt;resources&gt;
+
+				&lt;!-- Keep app version here instead of in manifest so I can easily use it in the code --&gt;
+				&lt;string name="libisoblue_version"&gt;${versioning.name}&lt;/string&gt;
+
+			&lt;/resources&gt;
+    	</echo>
+    </target>
+	
+    <target name="-post-build" >
+		<if condition="${project.is.library}">
+			<then>
+			    <script language="javascript">
+			        project.setProperty("out.library.jar.newfile", project.getProperty("ant.project.name").toLowerCase());
+			    </script>
+				<move file="${out.library.jar.file}" tofile="${out.absolute.dir}/${out.library.jar.newfile}.jar"/>
+			</then>
+		</if>
+    </target>
+	
+</project>
