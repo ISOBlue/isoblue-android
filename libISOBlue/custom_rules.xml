@@ -44,14 +44,13 @@
     </target>
 	
     <target name="-post-build" >
-		<if condition="${project.is.library}">
-			<then>
-			    <script language="javascript">
-			        project.setProperty("out.library.jar.newfile", project.getProperty("ant.project.name").toLowerCase());
-			    </script>
-				<move file="${out.library.jar.file}" tofile="${out.absolute.dir}/${out.library.jar.newfile}.jar"/>
-			</then>
-		</if>
+
+        <!-- Make a copy of the jar where eclipse will find it. -->
+		<script language="javascript">
+			project.setProperty("out.library.jar.newfile", project.getProperty("ant.project.name").toLowerCase());
+		</script>
+		<copy file="${out.library.jar.file}" tofile="${out.absolute.dir}/${out.library.jar.newfile}.jar"/>
+
     </target>
 	
 </project>
