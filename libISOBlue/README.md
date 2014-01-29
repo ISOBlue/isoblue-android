@@ -8,6 +8,16 @@ The idea is to transparently tunnel ISOBUS over Bluetooth to Android,
 making it appear as though the Android device is directly connected
 to the ISOBUS network which the *ISOBlue* device is on.
 
+Building
+---------
+*libISOBlue* builds with `ant`.
+See [here][ant] for details on using `ant`.
+[ant]: http://developer.android.com/tools/building/building-cmdline.html
+
+*libISOBlue* can be made to compile in eclipse.
+This is done by adding the file `git_version.sh` as the first builder for the
+project in eclipse.
+
 Usage
 -----
 
