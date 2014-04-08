@@ -1,24 +1,25 @@
 /*
  * Author: Alex Layton <awlayton@purdue.edu>
- *
+ * 
  * Copyright (c) 2013 Purdue University
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package org.isoblue.isoblue;
@@ -41,208 +42,208 @@ import android.util.Log;
 
 public class ISOBlueDevice extends ISOBUSNetwork {
 
-	private static final UUID MY_UUID = UUID
-			.fromString("00000000-0000-0000-0000-00000000abcd");
-	private static final byte[] MY_PIN = { '0', '0', '0', '0' };
+    private static final UUID MY_UUID = UUID
+            .fromString("00000000-0000-0000-0000-00000000abcd");
+    private static final byte[] MY_PIN = { '0', '0', '0', '0' };
 
-	private BluetoothDevice mDevice;
-	private volatile BluetoothSocket mSocket;
-	private ISOBlueBus mEngineBus, mImplementBus;
-	private Thread mReadThread, mWriteThread;
-	private BlockingQueue<ISOBlueCommand> mOutCommands;
+    private BluetoothDevice mDevice;
+    private volatile BluetoothSocket mSocket;
+    private ISOBlueBus mEngineBus, mImplementBus;
+    private Thread mReadThread, mWriteThread;
+    private BlockingQueue<ISOBlueCommand> mOutCommands;
 
-	public ISOBlueDevice(BluetoothDevice device) throws IOException {
-		mDevice = device;
+    public ISOBlueDevice(BluetoothDevice device) throws IOException {
+        mDevice = device;
 
-		mEngineBus = new ISOBlueBus(this, ISOBlueBus.BusType.ENGINE);
-		mImplementBus = new ISOBlueBus(this, ISOBlueBus.BusType.IMPLEMENT);
+        mEngineBus = new ISOBlueBus(this, ISOBlueBus.BusType.ENGINE);
+        mImplementBus = new ISOBlueBus(this, ISOBlueBus.BusType.IMPLEMENT);
 
-		mOutCommands = new LinkedBlockingQueue<ISOBlueCommand>();
+        mOutCommands = new LinkedBlockingQueue<ISOBlueCommand>();
 
-		try {
-			device.getClass().getMethod("setPin", byte[].class)
-					.invoke(device, MY_PIN);
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		mSocket = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
-		mSocket.connect();
+        try {
+            device.getClass().getMethod("setPin", byte[].class)
+                    .invoke(device, MY_PIN);
+        } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        mSocket = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
+        mSocket.connect();
 
-		mReadThread = new ReadThread();
-		mWriteThread = new WriteThread();
+        mReadThread = new ReadThread();
+        mWriteThread = new WriteThread();
 
-		mReadThread.start();
-		mWriteThread.start();
-	}
+        mReadThread.start();
+        mWriteThread.start();
+    }
 
-	private synchronized BluetoothSocket reconnectSocket() {
-		try {
-			mSocket.close();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		mSocket = null;
-		while (mSocket == null) {
-			try {
-				mSocket = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
-				mSocket.connect();
-			} catch (IOException e) {
-				mSocket = null;
+    private synchronized BluetoothSocket reconnectSocket() {
+        try {
+            mSocket.close();
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        mSocket = null;
+        while (mSocket == null) {
+            try {
+                mSocket = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                mSocket.connect();
+            } catch (IOException e) {
+                mSocket = null;
 
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				android.os.SystemClock.sleep(100);
-			}
-		}
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                android.os.SystemClock.sleep(100);
+            }
+        }
 
-		return mSocket;
-	}
+        return mSocket;
+    }
 
-	protected void sendCommand(ISOBlueCommand cmd) throws InterruptedException {
-		mOutCommands.put(cmd);
+    protected void sendCommand(ISOBlueCommand cmd) throws InterruptedException {
+        mOutCommands.put(cmd);
 
-		Log.d("CMD", cmd.toString());
-	}
+        Log.d("CMD", cmd.toString());
+    }
 
-	public Bus getEngineBus() {
-		return mEngineBus;
-	}
+    public Bus getEngineBus() {
+        return mEngineBus;
+    }
 
-	public Bus getImplementBus() {
-		return mImplementBus;
-	}
+    public Bus getImplementBus() {
+        return mImplementBus;
+    }
 
-	private class ReadThread extends Thread {
+    private class ReadThread extends Thread {
 
-		private BufferedReader mReader;
+        private BufferedReader mReader;
 
-		private ReadThread() throws IOException {
-			mReader = new BufferedReader(new InputStreamReader(
-					mSocket.getInputStream()));
-		}
+        private ReadThread() throws IOException {
+            mReader = new BufferedReader(new InputStreamReader(
+                    mSocket.getInputStream()));
+        }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Thread#run()
-		 */
-		@Override
-		public void run() {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {
 
-			while (true) {
-				while (true) {
-					String line;
-					ISOBlueCommand cmd;
+            while (true) {
+                while (true) {
+                    String line;
+                    ISOBlueCommand cmd;
 
-					// Receive the command
-					try {
-						line = mReader.readLine();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						break;
-					}
-					Log.d("CMD", line);
+                    // Receive the command
+                    try {
+                        line = mReader.readLine();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        break;
+                    }
+                    Log.d("CMD", line);
 
-					// Parse the command
-					try {
-						cmd = ISOBlueCommand.receiveCommand(line);
+                    // Parse the command
+                    try {
+                        cmd = ISOBlueCommand.receiveCommand(line);
 
-						switch (cmd.getBus()) {
-						case 0:
-							mEngineBus.handleCommand(cmd);
-							break;
+                        switch (cmd.getBus()) {
+                        case 0:
+                            mEngineBus.handleCommand(cmd);
+                            break;
 
-						case 1:
-							mImplementBus.handleCommand(cmd);
-							break;
-						}
-					} catch (RuntimeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						continue;
-					}
-				}
+                        case 1:
+                            mImplementBus.handleCommand(cmd);
+                            break;
+                        }
+                    } catch (RuntimeException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        continue;
+                    }
+                }
 
-				synchronized (mSocket) {
-					try {
-						reconnectSocket();
-						mReader = new BufferedReader(new InputStreamReader(
-								mSocket.getInputStream()));
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
+                synchronized (mSocket) {
+                    try {
+                        reconnectSocket();
+                        mReader = new BufferedReader(new InputStreamReader(
+                                mSocket.getInputStream()));
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
 
-	private class WriteThread extends Thread {
+    private class WriteThread extends Thread {
 
-		private OutputStream mOut;
+        private OutputStream mOut;
 
-		private WriteThread() throws IOException {
-			mOut = mSocket.getOutputStream();
-		}
+        private WriteThread() throws IOException {
+            mOut = mSocket.getOutputStream();
+        }
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Thread#run()
-		 */
-		@Override
-		public void run() {
-			ISOBlueCommand cmd;
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Thread#run()
+         */
+        @Override
+        public void run() {
+            ISOBlueCommand cmd;
 
-			while (true) {
-				while (true) {
-					try {
-						cmd = mOutCommands.take();
+            while (true) {
+                while (true) {
+                    try {
+                        cmd = mOutCommands.take();
 
-						cmd.sendCommand(mOut);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						break;
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						break;
-					} catch (NullPointerException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						break;
-					}
-				}
+                        cmd.sendCommand(mOut);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        break;
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        break;
+                    } catch (NullPointerException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        break;
+                    }
+                }
 
-				synchronized (mSocket) {
-					try {
-						mOut = mSocket.getOutputStream();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
+                synchronized (mSocket) {
+                    try {
+                        mOut = mSocket.getOutputStream();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
 
-	/**
-	 * @return the mDevice
-	 */
-	public BluetoothDevice getDevice() {
-		return mDevice;
-	}
+    /**
+     * @return the mDevice
+     */
+    public BluetoothDevice getDevice() {
+        return mDevice;
+    }
 }
