@@ -24,6 +24,7 @@
 
 package org.isoblue.isoblue;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
@@ -100,6 +101,7 @@ public class ISOBlueBus extends Bus {
         case MESG:
             // TODO: Support multiple sockets per bus?
             // int sock;
+            Serializable id;
             short saddr;
             short daddr;
             PGN pgn;
@@ -110,11 +112,12 @@ public class ISOBlueBus extends Bus {
 
             cmdData = new String(cmd.getData());
 
-            pgn = new PGN(Integer.parseInt(cmdData.substring(0, 5), 16));
-            daddr = Short.parseShort(cmdData.substring(5, 7), 16);
-            len = Integer.parseInt(cmdData.substring(7, 11), 16);
+            id = Integer.parseInt(cmdData.substring(0, 8), 16);
+            pgn = new PGN(Integer.parseInt(cmdData.substring(8, 13), 16));
+            daddr = Short.parseShort(cmdData.substring(13, 15), 16);
+            len = Integer.parseInt(cmdData.substring(15, 19), 16);
             data = new byte[len];
-            int curs = 11;
+            int curs = 19;
             for (int i = 0; i < len; i++) {
                 data[i] = (byte) Integer.parseInt(
                         cmdData.substring(curs, curs + 2), 16);
@@ -131,7 +134,8 @@ public class ISOBlueBus extends Bus {
             // daddr);
 
             for (ISOBUSSocket socket : mSocks) {
-                super.passMessageIn(socket, daddr, saddr, pgn, data, timestamp);
+                super.passMessageIn(socket, id, daddr, saddr, pgn, data,
+                        timestamp);
             }
             break;
 

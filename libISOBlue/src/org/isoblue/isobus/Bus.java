@@ -24,6 +24,7 @@
 
 package org.isoblue.isobus;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 public abstract class Bus {
@@ -46,9 +47,9 @@ public abstract class Bus {
 
     protected abstract Collection<ISOBUSSocket> initSocks();
 
-    protected void passMessageIn(ISOBUSSocket socket, short daddr, short saddr,
-            PGN pgn, byte[] data, long timestamp) {
-        socket.receive(new Message(daddr, saddr, pgn, data, timestamp));
+    protected void passMessageIn(ISOBUSSocket socket, Serializable id,
+            short daddr, short saddr, PGN pgn, byte[] data, long timestamp) {
+        socket.receive(new Message(id, daddr, saddr, pgn, data, timestamp));
     }
 
     protected abstract void passMessageOut(Message message)

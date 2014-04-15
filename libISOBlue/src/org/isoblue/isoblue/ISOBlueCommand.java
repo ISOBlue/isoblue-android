@@ -36,7 +36,9 @@ public final class ISOBlueCommand {
         FILT('F'),
         WRITE('W'),
         MESG('M'),
-        ACK('A');
+        ACK('A'),
+        PAST('P'),
+        OLD_MESG('O');
 
         public final char val;
 
