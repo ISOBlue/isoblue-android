@@ -96,9 +96,13 @@ public class ISOBUSSocket implements Closeable {
 
         mInMessages = new LinkedBlockingQueue<Message>();
 
-        if (!mBus.attach(this)) {
-            throw new IOException("Could not connect to bus: " + bus);
+        if (!connect()) {
+            throw new IOException("Could not connect to bus: " + mBus);
         }
+    }
+    
+    protected boolean connect() {
+        return mBus.attach(this);
     }
 
     /**

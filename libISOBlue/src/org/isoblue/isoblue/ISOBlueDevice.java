@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -35,6 +36,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.isoblue.isobus.Bus;
 import org.isoblue.isobus.ISOBUSNetwork;
+import org.isoblue.isobus.ISOBUSSocket;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -51,6 +53,9 @@ public class ISOBlueDevice extends ISOBUSNetwork {
     private ISOBlueBus mEngineBus, mImplementBus;
     private Thread mReadThread, mWriteThread;
     private BlockingQueue<ISOBlueCommand> mOutCommands;
+
+    private transient Serializable mStartId;
+    private transient Object mStartIdLock;
 
     public ISOBlueDevice(BluetoothDevice device) throws IOException {
         mDevice = device;
@@ -82,8 +87,49 @@ public class ISOBlueDevice extends ISOBUSNetwork {
         mReadThread = new ReadThread();
         mWriteThread = new WriteThread();
 
+        mStartId = null;
+        mStartIdLock = new Object();
+
         mReadThread.start();
         mWriteThread.start();
+    }
+
+    /**
+     * Create a pair of {@link BufferedISOBUSSocket}s which will receive all
+     * {@link Message}s stored by ISOBlue coming after the specified one. <br>
+     * One socket will receive engine bus messages and the other will receive
+     * implement bus messages.
+     * 
+     * @param fromId
+     *            the ID corresponding to the {@link Message} after which these
+     *            sockets will start receiving
+     * @return An array containing two buffered sockets. <br>
+     *         Index 0 contains the socket which will receive engine bus
+     *         messages. <br>
+     *         Index 1 contains the socket which will receive implement bus
+     *         messages.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public ISOBUSSocket[] createBufferedISOBUSSockets(Serializable fromId)
+            throws IOException, InterruptedException {
+        BufferedISOBUSSocket[] socks = new BufferedISOBUSSocket[2];
+        Serializable toId;
+
+        toId = getStartId();
+
+        // Create socket for past engine messages
+        socks[0] = new BufferedISOBUSSocket(fromId, toId, mEngineBus, null,
+                null);
+        // Create socket for past implement messages
+        socks[1] = new BufferedISOBUSSocket(fromId, toId, mImplementBus, null,
+                null);
+
+        // Create command to ask ISOBlue for past data
+        sendCommand((new ISOBlueCommand(ISOBlueCommand.OpCode.PAST, (short) -1,
+                (short) -1, String.format("%8x%8x", fromId, toId).getBytes())));
+
+        return socks;
     }
 
     private synchronized BluetoothSocket reconnectSocket() {
@@ -124,6 +170,21 @@ public class ISOBlueDevice extends ISOBUSNetwork {
         return mImplementBus;
     }
 
+    protected Serializable getStartId() {
+        synchronized (mStartIdLock) {
+            while (mStartId == null) {
+                try {
+                    mStartIdLock.wait();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return mStartId;
+    }
+
     private class ReadThread extends Thread {
 
         private BufferedReader mReader;
@@ -144,7 +205,6 @@ public class ISOBlueDevice extends ISOBUSNetwork {
             while (true) {
                 while (true) {
                     String line;
-                    ISOBlueCommand cmd;
 
                     // Receive the command
                     try {
@@ -158,16 +218,30 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 
                     // Parse the command
                     try {
+                        ISOBlueCommand cmd;
+                        Serializable id;
+
                         cmd = ISOBlueCommand.receiveCommand(line);
 
                         switch (cmd.getBus()) {
                         case 0:
-                            mEngineBus.handleCommand(cmd);
+                            id = mEngineBus.handleCommand(cmd);
                             break;
 
                         case 1:
-                            mImplementBus.handleCommand(cmd);
+                            id = mImplementBus.handleCommand(cmd);
                             break;
+
+                        default:
+                            continue;
+                        }
+
+                        // TODO: Do this one time assignment more efficiently?
+                        if (mStartId == null) {
+                            synchronized (mStartIdLock) {
+                                mStartId = id;
+                                mStartIdLock.notifyAll();
+                            }
                         }
                     } catch (RuntimeException e) {
                         // TODO Auto-generated catch block

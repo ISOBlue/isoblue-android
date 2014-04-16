@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.isoblue.isobus.Bus;
+
 public final class ISOBlueCommand {
 
     public enum OpCode {
@@ -91,6 +93,24 @@ public final class ISOBlueCommand {
 
         mData = new byte[data.length];
         System.arraycopy(data, 0, mData, 0, data.length);
+    }
+
+    public ISOBlueCommand(OpCode opCode, Bus.BusType bus, short sock,
+            byte data[]) {
+        this(opCode, busShort(bus), sock, data);
+    }
+    
+    private static short busShort(Bus.BusType bus) {
+        switch (bus) {
+        case ENGINE:
+            return 0;
+
+        case IMPLEMENT:
+            return 1;
+
+        default:
+            return -1;
+        }
     }
 
     /*

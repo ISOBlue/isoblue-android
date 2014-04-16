@@ -36,6 +36,7 @@ import org.isoblue.isobus.PGN;
 public class ISOBlueBus extends Bus {
 
     private ConstantIndexVector<ISOBUSSocket> mSocks;
+    private ConstantIndexVector<BufferedISOBUSSocket> mBufferedSocks;
 
     public ISOBlueBus(ISOBlueDevice network, BusType type) {
         super(network, type);
@@ -50,7 +51,6 @@ public class ISOBlueBus extends Bus {
     protected boolean attach(ISOBUSSocket sock) {
         Set<PGN> pgns;
         ISOBlueCommand cmd;
-        short bus;
         StringBuilder s = new StringBuilder();
 
         if (!super.attach(sock)) {
@@ -58,27 +58,13 @@ public class ISOBlueBus extends Bus {
         }
         pgns = sock.getPgns();
 
-        switch (super.getType()) {
-        case ENGINE:
-            bus = 0;
-            break;
-
-        case IMPLEMENT:
-            bus = 1;
-            break;
-
-        default:
-            bus = -1;
-            break;
-        }
-
         s.append(String.format("%5x", pgns.size()));
         for (PGN pgn : pgns) {
             s.append(String.format("%5x", pgn.asInt()));
         }
 
-        cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, bus, (short) 0, s
-                .toString().getBytes());
+        cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, getType(),
+                (short) 0, s.toString().getBytes());
 
         try {
             ((ISOBlueDevice) super.getNetwork()).sendCommand(cmd);
@@ -91,57 +77,70 @@ public class ISOBlueBus extends Bus {
         return true;
     }
 
+    protected boolean attach(BufferedISOBUSSocket sock) {
+        mBufferedSocks.add(sock);
+        return true;
+    }
+
     @Override
     protected Collection<ISOBUSSocket> initSocks() {
+        mBufferedSocks = new ConstantIndexVector<BufferedISOBUSSocket>();
         return mSocks = new ConstantIndexVector<ISOBUSSocket>();
     }
 
-    protected void handleCommand(ISOBlueCommand cmd) {
+    protected Serializable handleCommand(ISOBlueCommand cmd) {
+        Collection<? extends ISOBUSSocket> sockets;
+
         switch (cmd.getOpCode()) {
         case MESG:
-            // TODO: Support multiple sockets per bus?
-            // int sock;
-            Serializable id;
-            short saddr;
-            short daddr;
-            PGN pgn;
-            long timestamp;
-            int len;
-            byte data[];
-            String cmdData;
+            sockets = mSocks;
+            break;
 
-            cmdData = new String(cmd.getData());
-
-            id = Integer.parseInt(cmdData.substring(0, 8), 16);
-            pgn = new PGN(Integer.parseInt(cmdData.substring(8, 13), 16));
-            daddr = Short.parseShort(cmdData.substring(13, 15), 16);
-            len = Integer.parseInt(cmdData.substring(15, 19), 16);
-            data = new byte[len];
-            int curs = 19;
-            for (int i = 0; i < len; i++) {
-                data[i] = (byte) Integer.parseInt(
-                        cmdData.substring(curs, curs + 2), 16);
-                curs += 2;
-            }
-            timestamp = Long.parseLong(cmdData.substring(curs, curs + 8), 16)
-                    * 1000000
-                    + Integer.parseInt(cmdData.substring(curs + 8, curs + 13),
-                            16);
-            saddr = Short.parseShort(cmdData.substring(curs + 13, curs + 15),
-                    16);
-            // Log.d("IBBUS", "bus:" + getType() + " data:\"" + str +
-            // "\" timestamp:" + timestamp + " saddr:" + saddr + " daddr:" +
-            // daddr);
-
-            for (ISOBUSSocket socket : mSocks) {
-                super.passMessageIn(socket, id, daddr, saddr, pgn, data,
-                        timestamp);
-            }
+        case OLD_MESG:
+            sockets = mBufferedSocks;
             break;
 
         default:
-            break;
+            return null;
         }
+
+        // TODO: Support multiple sockets per bus?
+        // int sock;
+        Serializable id;
+        short saddr;
+        short daddr;
+        PGN pgn;
+        long timestamp;
+        int len;
+        byte data[];
+        String cmdData;
+
+        cmdData = new String(cmd.getData());
+
+        id = Integer.parseInt(cmdData.substring(0, 8), 16);
+        pgn = new PGN(Integer.parseInt(cmdData.substring(8, 13), 16));
+        daddr = Short.parseShort(cmdData.substring(13, 15), 16);
+        len = Integer.parseInt(cmdData.substring(15, 19), 16);
+        data = new byte[len];
+        int curs = 19;
+        for (int i = 0; i < len; i++) {
+            data[i] = (byte) Integer.parseInt(
+                    cmdData.substring(curs, curs + 2), 16);
+            curs += 2;
+        }
+        timestamp = Long.parseLong(cmdData.substring(curs, curs + 8), 16)
+                * 1000000
+                + Integer.parseInt(cmdData.substring(curs + 8, curs + 13), 16);
+        saddr = Short.parseShort(cmdData.substring(curs + 13, curs + 15), 16);
+        // Log.d("IBBUS", "bus:" + getType() + " data:\"" + str +
+        // "\" timestamp:" + timestamp + " saddr:" + saddr + " daddr:" +
+        // daddr);
+
+        for (ISOBUSSocket socket : sockets) {
+            super.passMessageIn(socket, id, daddr, saddr, pgn, data, timestamp);
+        }
+
+        return id;
     }
 
     @Override
