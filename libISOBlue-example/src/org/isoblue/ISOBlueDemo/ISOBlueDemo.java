@@ -55,6 +55,9 @@ public class ISOBlueDemo extends Activity {
     public static final int MESSAGE_READ_IMP = 3;
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
+    // Message argument 1 values
+    public static final int MESSAGE_ARG1_NEW = 1;
+    public static final int MESSAGE_ARG1_BUF = 2;
 
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
