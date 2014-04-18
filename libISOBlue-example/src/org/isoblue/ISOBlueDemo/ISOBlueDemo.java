@@ -70,12 +70,16 @@ public class ISOBlueDemo extends Activity {
     // Layout Views
     private ListView mEngList;
     private ListView mImpList;
+    private ListView mBufEngList;
+    private ListView mBufImpList;
 
     // Name of the connected device
     private String mConnectedDeviceName = null;
     // Array adapter for the conversation thread
     private ArrayAdapter<String> mEngArrayAdapter;
     private ArrayAdapter<String> mImpArrayAdapter;
+    private ArrayAdapter<String> mBufEngArrayAdapter;
+    private ArrayAdapter<String> mBufImpArrayAdapter;
     // String buffer for outgoing messages
     private StringBuffer mOutStringBuffer;
     // Local Bluetooth adapter
@@ -160,6 +164,13 @@ public class ISOBlueDemo extends Activity {
         mEngList.setAdapter(mEngArrayAdapter);
         mImpList = (ListView) findViewById(R.id.imp);
         mImpList.setAdapter(mImpArrayAdapter);
+
+        mBufEngArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
+        mBufImpArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
+        mBufEngList = (ListView) findViewById(R.id.buf_eng);
+        mBufEngList.setAdapter(mBufEngArrayAdapter);
+        mBufImpList = (ListView) findViewById(R.id.buf_imp);
+        mBufImpList.setAdapter(mBufImpArrayAdapter);
 
         // Initialize the BluetoothChatService to perform bluetooth connections
         mChatService = new BluetoothService(this, mHandler);
@@ -252,7 +263,14 @@ public class ISOBlueDemo extends Activity {
                 values.put(ISOBUSOpenHelper.COLUMN_BUS, "engine");
                 values.put(ISOBUSOpenHelper.COLUMN_TIME, m.getTimeStamp());
                 mDatabase.insert(ISOBUSOpenHelper.TABLE_MESSAGES, null, values);
-                mEngArrayAdapter.add(m.toString());
+                switch (msg.arg1) {
+                case MESSAGE_ARG1_NEW:
+                    mEngArrayAdapter.add(m.toString());
+                    break;
+                case MESSAGE_ARG1_BUF:
+                    mBufEngArrayAdapter.add(m.toString());
+                    break;
+                }
                 break;
             case MESSAGE_READ_IMP:
                 m = (org.isoblue.isobus.Message) msg.obj;
@@ -264,7 +282,14 @@ public class ISOBlueDemo extends Activity {
                 values.put(ISOBUSOpenHelper.COLUMN_BUS, "implement");
                 values.put(ISOBUSOpenHelper.COLUMN_TIME, m.getTimeStamp());
                 mDatabase.insert(ISOBUSOpenHelper.TABLE_MESSAGES, null, values);
-                mImpArrayAdapter.add(m.toString());
+                switch (msg.arg1) {
+                case MESSAGE_ARG1_NEW:
+                    mImpArrayAdapter.add(m.toString());
+                    break;
+                case MESSAGE_ARG1_BUF:
+                    mBufImpArrayAdapter.add(m.toString());
+                    break;
+                }
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
