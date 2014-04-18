@@ -1,5 +1,7 @@
 /*
- * File from http://www.techrepublic.com/blog/android-app-builder/a-reusable-about-dialog-for-your-android-apps/
+ * File from
+ * http://www.techrepublic.com/blog/android-app-builder/a-reusable-about
+ * -dialog-for-your-android-apps/
  */
 package com.authorwjf;
 
