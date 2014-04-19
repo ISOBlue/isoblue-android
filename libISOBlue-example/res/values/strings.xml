@@ -37,6 +37,8 @@
     <string name="button_scan">Scan for devices</string>
     <string name="eng_list_title">Engine Bus Messages</string>
     <string name="imp_list_title">Implement Bus Messages</string>
+    <string name="buf_eng_list_title">Buffered Engine Bus Messages</string>
+    <string name="buf_imp_list_title">Buffered Implement Bus Messages</string>
 
     <!-- Options Menu -->
     <string name="insecure_connect">Connect a device</string>

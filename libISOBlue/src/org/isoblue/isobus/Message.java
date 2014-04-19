@@ -1,24 +1,25 @@
 /*
  * Author: Alex Layton <alex@layton.in>
- *
+ * 
  * Copyright (c) 2013 Purdue University
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package org.isoblue.isobus;
@@ -30,13 +31,18 @@ import java.util.Arrays;
  * Represents an ISOBUS message. Messages are the datagrams which are
  * sent/received on the ISOBUS network, using {@link ISOBUSSocket#read()} and
  * {@link ISOBUSSocket#write(Message)} respectively.
- * 
+ *
  * @see ISOBUSSocket
  * @author Alex Layton <alex@layton.in>
  */
 public final class Message implements Serializable {
 
-    private static final long serialVersionUID = -6647787001098942451L;
+    private static final long serialVersionUID = 9109136928782406932L;
+
+    /**
+     * Identifier of this {@link Message}.
+     */
+    private final Serializable mId;
 
     // TODO: Use NAMEs instead of addresses for source/destination
     /**
@@ -100,13 +106,15 @@ public final class Message implements Serializable {
      * @see PGN
      */
     public Message(short destAddr, PGN pgn, byte data[]) {
-        this(destAddr, (short) -1, pgn, data, -1);
+        this(null, destAddr, (short) -1, pgn, data, -1);
     }
 
     /**
      * Constructs a new {@link Message} with the specified destination, source,
      * {@link PGN}, data, and timestamp.
      * 
+     * @param id
+     *            the identifier assigned to this message
      * @param destAddr
      *            the address of the destination
      * @param srcAddr
@@ -122,18 +130,28 @@ public final class Message implements Serializable {
      * 
      * @see PGN
      */
-    protected Message(short destAddr, short srcAddr, PGN pgn, byte data[],
-            long timeStamp) {
+    protected Message(Serializable id, short destAddr, short srcAddr, PGN pgn,
+            byte data[], long timeStamp) {
         if (pgn == null) {
             throw new NullPointerException("Parameter pgn was null");
         }
 
+        mId = id;
         mDestAddr = destAddr;
         mSrcAddr = srcAddr;
         mPgn = pgn;
         // Handle data being null, and copy it so it won't change on us
         mData = data == null ? new byte[0] : data.clone();
         mTimestamp = timeStamp;
+    }
+
+    /**
+     * Get the identifier assigned to this {@link Message}
+     *
+     * @return the id
+     */
+    public Serializable getId() {
+        return mId;
     }
 
     /**
@@ -190,7 +208,10 @@ public final class Message implements Serializable {
     public String toString() {
         StringBuilder s = new StringBuilder();
 
-        s.append("PGN:").append(mPgn);
+        if (mId != null) {
+            s.append("ID:").append(mId).append(" ");
+        }
+        s.append("PGN:").append(mPgn.asInt());
         s.append(" SA:").append(mSrcAddr);
         s.append(" DA:").append(mDestAddr);
 
@@ -203,10 +224,10 @@ public final class Message implements Serializable {
 
             if (val < 0x10)
                 s.append("0");
-            s.append(Integer.toString(val, 16));
+            s.append(Integer.toString(val, 16)).append(" ");
         }
 
-        s.append(" Time: ").append(mTimestamp);
+        s.append("Time: ").append(mTimestamp);
 
         return s.toString();
     }
@@ -249,6 +270,9 @@ public final class Message implements Serializable {
         if (fHashCode == 0) {
             int result = 7;
 
+            if (mId != null) {
+                result = 31 * result + mId.hashCode();
+            }
             result = 31 * result + mDestAddr;
             result = 31 * result + mSrcAddr;
             result = 31 * result + mPgn.hashCode();
