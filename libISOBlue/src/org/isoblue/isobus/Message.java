@@ -211,7 +211,7 @@ public final class Message implements Serializable {
         if (mId != null) {
             s.append("ID:").append(mId).append(" ");
         }
-        s.append("PGN:").append(mPgn);
+        s.append("PGN:").append(mPgn.asInt());
         s.append(" SA:").append(mSrcAddr);
         s.append(" DA:").append(mDestAddr);
 
@@ -224,10 +224,10 @@ public final class Message implements Serializable {
 
             if (val < 0x10)
                 s.append("0");
-            s.append(Integer.toString(val, 16));
+            s.append(Integer.toString(val, 16)).append(" ");
         }
 
-        s.append(" Time: ").append(mTimestamp);
+        s.append("Time: ").append(mTimestamp);
 
         return s.toString();
     }
