@@ -84,3 +84,27 @@ try {
 }
 ```
 
+### Creating "Buffered" Sockets ###
+The library can also create so called "buffered" sockets.
+They work the same as the non "buffered" ones,
+but reading from them returns messages which ISOBlue has buffered
+instead of what is currently going accross the ISOBUS.
+
+The creation of "buffred" sockets is slightly different.
+You need the identifier from a messge object to give to ISOBlue.
+This tells it to send you all messages which came after the one the identifier
+was from.
+```Java
+// Get identifier of the message after which the buffered messages should start
+// If you just want all buffered messages, set this to zero
+Serializable messageId = message.getId();
+
+// Retrieve a pair of "buffered" scokets, one for each bus
+ISOBUSSocket[] bufSockets = idb.createBufferedISOBUSSockets(messageId);
+
+// Place the sockets into separate variables (for convenience)
+ISOBUSSocket buEngSocket = bufSockets[0];
+ISOBUSSocket bufImpSocket = bufSockets[1];
+```
+The sockets can now be read as shown above for non "buffered" sockets.
+
