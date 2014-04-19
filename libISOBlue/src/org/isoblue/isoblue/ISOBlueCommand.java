@@ -65,18 +65,18 @@ public final class ISOBlueCommand {
     }
 
     private final OpCode mOpCode;
-    private final short mBus;
-    private final short mSock;
+    private final byte mBus;
+    private final byte mSock;
     private final byte mData[];
 
     public static ISOBlueCommand receiveCommand(String line) {
         OpCode opCode;
-        short bus;
-        short sock;
+        byte bus;
+        byte sock;
         String data;
 
         opCode = OpCode.fromVal(line.charAt(0));
-        sock = bus = (short) Integer.parseInt(line.substring(1, 2), 16);
+        sock = bus = (byte) Integer.parseInt(line.substring(1, 2), 16);
         data = line.substring(2, line.length());
 
         return new ISOBlueCommand(opCode, bus, sock, data.getBytes());
@@ -86,7 +86,7 @@ public final class ISOBlueCommand {
         os.write((this.toString() + "\n").getBytes());
     }
 
-    public ISOBlueCommand(OpCode opCode, short bus, short sock, byte data[]) {
+    public ISOBlueCommand(OpCode opCode, byte bus, byte sock, byte data[]) {
         mOpCode = opCode;
         mBus = bus;
         mSock = sock;
@@ -95,12 +95,12 @@ public final class ISOBlueCommand {
         System.arraycopy(data, 0, mData, 0, data.length);
     }
 
-    public ISOBlueCommand(OpCode opCode, Bus.BusType bus, short sock,
+    public ISOBlueCommand(OpCode opCode, Bus.BusType bus, byte sock,
             byte data[]) {
-        this(opCode, busShort(bus), sock, data);
+        this(opCode, busByte(bus), sock, data);
     }
-    
-    private static short busShort(Bus.BusType bus) {
+
+    private static byte busByte(Bus.BusType bus) {
         switch (bus) {
         case ENGINE:
             return 0;

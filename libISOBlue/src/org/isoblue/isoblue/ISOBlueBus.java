@@ -64,7 +64,7 @@ public class ISOBlueBus extends Bus {
         }
 
         cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, getType(),
-                (short) 0, s.toString().getBytes());
+                (byte) 0, s.toString().getBytes());
 
         try {
             ((ISOBlueDevice) super.getNetwork()).sendCommand(cmd);
@@ -146,7 +146,7 @@ public class ISOBlueBus extends Bus {
     @Override
     protected void passMessageOut(Message message) throws InterruptedException {
         ISOBlueCommand cmd;
-        short bus;
+        byte bus;
         byte data[];
         StringBuilder s = new StringBuilder();
 
@@ -171,7 +171,7 @@ public class ISOBlueBus extends Bus {
             s.append(String.format("%02x", b));
         }
 
-        cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.WRITE, (short) 0, bus, s
+        cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.WRITE, (byte) 0, bus, s
                 .toString().getBytes());
         ((ISOBlueDevice) super.getNetwork()).sendCommand(cmd);
     }
