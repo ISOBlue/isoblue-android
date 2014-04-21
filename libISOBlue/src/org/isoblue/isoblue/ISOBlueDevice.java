@@ -127,7 +127,7 @@ public class ISOBlueDevice extends ISOBUSNetwork {
 
         // Create command to ask ISOBlue for past data
         sendCommand((new ISOBlueCommand(ISOBlueCommand.OpCode.PAST, (byte) -1,
-                (byte) -1, String.format("%8x%8x", fromId, toId).getBytes())));
+                (byte) -1, String.format("%08x%08x", fromId, toId).getBytes())));
 
         return socks;
     }

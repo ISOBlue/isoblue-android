@@ -58,9 +58,9 @@ public class ISOBlueBus extends Bus {
         }
         pgns = sock.getPgns();
 
-        s.append(String.format("%5x", pgns.size()));
+        s.append(String.format("%05x", pgns.size()));
         for (PGN pgn : pgns) {
-            s.append(String.format("%5x", pgn.asInt()));
+            s.append(String.format("%05x", pgn.asInt()));
         }
 
         cmd = new ISOBlueCommand(ISOBlueCommand.OpCode.FILT, getType(),
