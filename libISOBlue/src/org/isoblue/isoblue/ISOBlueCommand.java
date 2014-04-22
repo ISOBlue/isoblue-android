@@ -88,6 +88,10 @@ public final class ISOBlueCommand {
 
     public ISOBlueCommand(OpCode opCode, byte bus, byte sock, byte data[]) {
         mOpCode = opCode;
+        // Check bus fits into one nibble
+        if(bus > 127 || bus < -128) {
+            throw new IllegalArgumentException("bus must only be one nibble, given " + bus);
+        }
         mBus = bus;
         mSock = sock;
 
@@ -125,7 +129,7 @@ public final class ISOBlueCommand {
         s = new StringBuilder();
 
         s.append(this.mOpCode.val);
-        s.append(String.format("%1x", this.mBus));
+        s.append(String.format("%1x", this.mBus).substring(0, 1));
         s.append(new String(this.mData));
 
         return s.toString();
