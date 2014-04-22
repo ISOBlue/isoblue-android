@@ -237,7 +237,9 @@ public class ISOBlueDevice extends ISOBUSNetwork {
                         }
 
                         // TODO: Do this one time assignment more efficiently?
-                        if (mStartId == null) {
+                        if (mStartId == null
+                                && cmd.getOpCode().equals(
+                                        ISOBlueCommand.OpCode.MESG)) {
                             synchronized (mStartIdLock) {
                                 mStartId = id;
                                 mStartIdLock.notifyAll();
