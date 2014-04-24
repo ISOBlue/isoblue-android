@@ -388,6 +388,9 @@ public class BluetoothService {
                     // Start the service over to restart listening mode
                     BluetoothService.this.start();
                     break;
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         }

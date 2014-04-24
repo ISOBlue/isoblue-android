@@ -168,7 +168,7 @@ public class ISOBlueDevice extends ISOBUSNetwork {
     protected void sendCommand(ISOBlueCommand cmd) throws InterruptedException {
         mOutCommands.put(cmd);
 
-        Log.d("CMD", cmd.toString());
+        Log.d("CMD-OUT", cmd.toString());
     }
 
     public Bus getEngineBus() {
@@ -183,7 +183,7 @@ public class ISOBlueDevice extends ISOBUSNetwork {
         synchronized (mStartIdLock) {
             while (mStartId == null) {
                 try {
-                    mStartIdLock.wait();
+                    mStartIdLock.wait(10L);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -194,13 +194,27 @@ public class ISOBlueDevice extends ISOBUSNetwork {
         return mStartId;
     }
 
+    private void setStartId(ISOBlueCommand cmd) {
+        // TODO: Yuck :(
+        synchronized (mStartIdLock) {
+            Serializable id;
+
+            id = Integer.parseInt((new String(cmd.getData()).substring(0, 8)),
+                    16);
+            mStartId = id;
+            mStartIdLock.notifyAll();
+        }
+    }
+
     private class ReadThread extends Thread {
 
         private BufferedReader mReader;
+        private boolean mStarted;
 
         private ReadThread() throws IOException {
             mReader = new BufferedReader(new InputStreamReader(
                     mSocket.getInputStream()));
+            mStarted = false;
         }
 
         /*
@@ -223,36 +237,52 @@ public class ISOBlueDevice extends ISOBUSNetwork {
                         e.printStackTrace();
                         break;
                     }
-                    Log.d("CMD", line);
+                    Log.d("CMD-IN", line);
 
                     // Parse the command
                     try {
                         ISOBlueCommand cmd;
-                        Serializable id;
 
                         cmd = ISOBlueCommand.receiveCommand(line);
 
-                        switch (cmd.getBus()) {
-                        case 0:
-                            id = mEngineBus.handleCommand(cmd);
+                        switch (cmd.getOpCode()) {
+                        case MESG:
+                            // TODO: Figure out why this is needed...
+                            if (!mStarted) {
+                                // Ignore stuff before ISOBlue knows we're new
+                                setStartId(cmd);
+                                mStarted = true;
+                                continue;
+                            }
                             break;
 
-                        case 1:
-                            id = mImplementBus.handleCommand(cmd);
+                        case OLD_MESG:
+                            if (!mStarted) {
+                                // Ignore stuff before ISOBlue knows we're new
+                                continue;
+                            }
                             break;
+
+                        case START:
+                            setStartId(cmd);
+                            mStarted = true;
+                            continue;
 
                         default:
                             continue;
                         }
 
-                        // TODO: Do this one time assignment more efficiently?
-                        if (mStartId == null
-                                && cmd.getOpCode().equals(
-                                        ISOBlueCommand.OpCode.MESG)) {
-                            synchronized (mStartIdLock) {
-                                mStartId = id;
-                                mStartIdLock.notifyAll();
-                            }
+                        switch (cmd.getBus()) {
+                        case 0:
+                            mEngineBus.handleCommand(cmd);
+                            break;
+
+                        case 1:
+                            mImplementBus.handleCommand(cmd);
+                            break;
+
+                        default:
+                            continue;
                         }
                     } catch (RuntimeException e) {
                         // TODO Auto-generated catch block

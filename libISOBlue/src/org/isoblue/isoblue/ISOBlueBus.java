@@ -104,7 +104,7 @@ public class ISOBlueBus extends Bus {
         return mSocks = new ConstantIndexVector<ISOBUSSocket>();
     }
 
-    protected Serializable handleCommand(ISOBlueCommand cmd) {
+    protected void handleCommand(ISOBlueCommand cmd) {
         Collection<? extends ISOBUSSocket> sockets;
 
         switch (cmd.getOpCode()) {
@@ -117,7 +117,7 @@ public class ISOBlueBus extends Bus {
             break;
 
         default:
-            return null;
+            return;
         }
 
         // TODO: Support multiple sockets per bus?
@@ -165,8 +165,6 @@ public class ISOBlueBus extends Bus {
         for (ISOBUSSocket socket : sockets) {
             super.passMessageIn(socket, message);
         }
-
-        return id;
     }
 
     @Override

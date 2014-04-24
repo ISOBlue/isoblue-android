@@ -90,7 +90,7 @@ public final class ISOBlueCommand {
     public ISOBlueCommand(OpCode opCode, byte bus, byte sock, byte data[]) {
         mOpCode = opCode;
         // Check bus fits into one nibble
-        if(bus > 7 || bus < -8) {
+        if(bus > 15 || bus < -8) {
             throw new IllegalArgumentException("bus must only be one nibble, given " + bus);
         }
         mBus = (byte) (bus & 0x0F);
