@@ -35,7 +35,7 @@ import java.util.Arrays;
  * @see ISOBUSSocket
  * @author Alex Layton <alex@layton.in>
  */
-public final class Message implements Serializable {
+public class Message implements Serializable {
 
     private static final long serialVersionUID = 9109136928782406932L;
 
@@ -130,7 +130,7 @@ public final class Message implements Serializable {
      * 
      * @see PGN
      */
-    protected Message(Serializable id, short destAddr, short srcAddr, PGN pgn,
+    public Message(Serializable id, short destAddr, short srcAddr, PGN pgn,
             byte data[], long timeStamp) {
         if (pgn == null) {
             throw new NullPointerException("Parameter pgn was null");
