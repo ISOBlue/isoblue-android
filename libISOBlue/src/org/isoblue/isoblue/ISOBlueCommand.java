@@ -40,7 +40,8 @@ public final class ISOBlueCommand {
         MESG('M'),
         ACK('A'),
         PAST('P'),
-        OLD_MESG('O');
+        OLD_MESG('O'),
+        START('S');
 
         public final char val;
 

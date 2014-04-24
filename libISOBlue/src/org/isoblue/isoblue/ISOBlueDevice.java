@@ -84,6 +84,15 @@ public class ISOBlueDevice extends ISOBUSNetwork {
         mSocket = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
         mSocket.connect();
 
+        // Send start command to ISOBlue
+        try {
+            sendCommand((new ISOBlueCommand(ISOBlueCommand.OpCode.START,
+                    (byte) -1, (byte) -1, new byte[0])));
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         mReadThread = new ReadThread();
         mWriteThread = new WriteThread();
 
