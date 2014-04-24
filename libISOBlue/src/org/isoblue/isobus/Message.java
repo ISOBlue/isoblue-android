@@ -236,7 +236,7 @@ public final class Message implements Serializable {
      * Compares this instance with the specified object and indicates if they
      * are equal. In order to be equal, {@code o} must be an instance of
      * {@code Message} with the same values for its destination, source, PGN,
-     * data, and timestamp.
+     * data, timestamp, and id.
      * 
      * @param o
      *            the object to compare this {@link PGN} with
@@ -257,7 +257,7 @@ public final class Message implements Serializable {
 
         return m.mDestAddr == this.mDestAddr && m.mSrcAddr == this.mSrcAddr
                 && m.mPgn.equals(this.mPgn) && m.mData.equals(this.mData)
-                && m.mTimestamp == this.mTimestamp;
+                && m.mTimestamp == this.mTimestamp && m.mId.equals(this.mId);
     }
 
     /*
