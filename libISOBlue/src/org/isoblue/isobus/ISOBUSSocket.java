@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a Socket style connection to a {@link Bus} on an ISOBUS Network.
@@ -77,7 +78,7 @@ public class ISOBUSSocket implements Closeable {
      * one of the given {@link PGN}s.
      * <p>
      * If no {@link PGN}s are given, all {@link Message}s are received.
-     * 
+     *
      * @param bus
      *            {@link Bus} to which to create a connection
      * @param name
@@ -100,7 +101,7 @@ public class ISOBUSSocket implements Closeable {
             throw new IOException("Could not connect to bus: " + mBus);
         }
     }
-    
+
     protected boolean connect() {
         return mBus.attach(this);
     }
@@ -109,7 +110,7 @@ public class ISOBUSSocket implements Closeable {
      * Writes (sends) the given {@link Message} using this {@link ISOBUSSocket}.
      * This method may block if there is not room in corresponding the out
      * buffer.
-     * 
+     *
      * @param message
      *            {@link Message} to write
      * @throws InterruptedException
@@ -122,15 +123,36 @@ public class ISOBUSSocket implements Closeable {
     /**
      * Reads (receives) a {@link Message} that came to this {@link ISOBUSSOcket}
      * . This method blocks if the in buffer is empty.
+     *
+     * @return a received {@link Message}
+     * @throws InterruptedException
+     *             if interrupted while waiting for a {@link Message}
      * 
+     * @see #ISOBUSSocket(Bus, NAME, Collection)
+     */
+    public Message read() throws InterruptedException, IOException {
+        return mInMessages.take();
+    }
+
+    /**
+     * Reads (receives) a {@link Message} that came to this {@link ISOBUSSOcket}
+     * , or {@code null} if the specified waiting time elapses before a
+     * {@link Message} is available
+     *
+     * @param timeout
+     *            how long to wait before giving up, in units of {@code unit}
+     * @param unit
+     *            a {@link TimeUnit} determining how to interpret the
+     *            {@code timeout} parameter
      * @return a received {link Message}
      * @throws InterruptedException
      *             if interrupted while waiting for a {@link Message}
      * 
      * @see #ISOBUSSocket(Bus, NAME, Collection)
      */
-    public Message read() throws InterruptedException {
-        return mInMessages.take();
+    public Message read(long timeout, TimeUnit unit)
+            throws InterruptedException, IOException {
+        return mInMessages.poll(timeout, unit);
     }
 
     protected boolean receive(Message message) {

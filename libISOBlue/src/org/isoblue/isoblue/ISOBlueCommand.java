@@ -40,7 +40,8 @@ public final class ISOBlueCommand {
         MESG('M'),
         ACK('A'),
         PAST('P'),
-        OLD_MESG('O');
+        OLD_MESG('O'),
+        START('S');
 
         public final char val;
 
@@ -88,7 +89,11 @@ public final class ISOBlueCommand {
 
     public ISOBlueCommand(OpCode opCode, byte bus, byte sock, byte data[]) {
         mOpCode = opCode;
-        mBus = bus;
+        // Check bus fits into one nibble
+        if(bus > 15 || bus < -8) {
+            throw new IllegalArgumentException("bus must only be one nibble, given " + bus);
+        }
+        mBus = (byte) (bus & 0x0F);
         mSock = sock;
 
         mData = new byte[data.length];

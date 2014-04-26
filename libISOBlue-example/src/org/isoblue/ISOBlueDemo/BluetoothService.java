@@ -388,6 +388,10 @@ public class BluetoothService {
                     // Start the service over to restart listening mode
                     BluetoothService.this.start();
                     break;
+                } catch (IOException e) {
+                    Log.e(TAG, "buffered data stopped", e);
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         }
