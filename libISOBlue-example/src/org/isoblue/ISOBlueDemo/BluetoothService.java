@@ -389,6 +389,7 @@ public class BluetoothService {
                     BluetoothService.this.start();
                     break;
                 } catch (IOException e) {
+                    Log.e(TAG, "buffered data stopped", e);
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
