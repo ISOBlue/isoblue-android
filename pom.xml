@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<groupId>org.isoblue</groupId>
+	<artifactId>isoblue-android</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>ISOBlue Android</name>
+	<description>Files related to the Android library for use with ISOBlue</description>
+	<url>http://isoblue.org</url>
+
+	<modules>
+		<module>libISOBlue</module>
+	</modules>
+
+	<scm>
+		<url>htttps://github.com/ISOBlue/isoblue-android/</url>
+		<connection>scm:git:git://github.com/ISOBlue/isoblue-android.git</connection>
+		<developerConnection>scm:git:git@github.com:ISOBlue/isoblue-android.git</developerConnection>
+		<tag>maven</tag>
+	</scm>
+
+	<developers>
+		<developer>
+			<name>Alex Layton</name>
+			<email>alex@layton.in</email>
+			<id>awlayton</id>
+			<url>http://alex.layton.in</url>
+			<timezone>-5</timezone>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The MIT License (MIT)</name>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>ISOBlue</name>
+		<url>http://isoblue.org</url>
+	</organization>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/ISOBlue/isoblue-software/issues</url>
+	</issueManagement>
+
+</project>
+
