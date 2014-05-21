@@ -10,7 +10,7 @@
 
 	<groupId>org.isoblue</groupId>
 	<artifactId>isoblue-android</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>ISOBlue Android</name>
@@ -25,7 +25,7 @@
 		<url>htttps://github.com/ISOBlue/isoblue-android/</url>
 		<connection>scm:git:git://github.com/ISOBlue/isoblue-android.git</connection>
 		<developerConnection>scm:git:git@github.com:ISOBlue/isoblue-android.git</developerConnection>
-		<tag>isoblue-android-1.0</tag>
+		<tag>maven</tag>
 	</scm>
 
 	<developers>
