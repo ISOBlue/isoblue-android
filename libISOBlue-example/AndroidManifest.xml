@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009 The Android Open Source Project
+<!--
+     Copyright (C) 2009 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,30 +15,41 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.isoblue.ISOBlueDemo"
-      android:versionCode="3"
-      android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="11"
-              android:targetSdkVersion="19" />
+    package="org.isoblue.ISOBlueDemo"
+    android:versionCode="3"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="19" />
+
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <application android:label="@string/app_name"
-                 android:icon="@drawable/app_icon"
-                 android:allowBackup="false" >
-        <activity android:name="org.isoblue.ISOBlueDemo.ISOBlueDemo"
-                  android:label="@string/app_name"
-                  android:screenOrientation="landscape"
-                  android:configChanges="orientation|keyboardHidden">
+    <application
+        android:allowBackup="false"
+        android:icon="@drawable/app_icon"
+        android:label="@string/app_name" >
+        <activity
+            android:name="org.isoblue.ISOBlueDemo.ISOBlueDemo"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="org.isoblue.ISOBlueDemo.DeviceListActivity"
-                  android:label="@string/select_device"
-                  android:theme="@android:style/Theme.Holo.Dialog"
-                  android:configChanges="orientation|keyboardHidden" />
+        <activity
+            android:name="org.isoblue.ISOBlueDemo.DeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/select_device"
+            android:theme="@android:style/Theme.Holo.Dialog" />
     </application>
+
 </manifest>
