@@ -14,42 +14,30 @@
 	<packaging>apk</packaging>
 
 	<name>Example ISOBlue App</name>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<platform.version>4.1.1.4</platform.version>
-		<android.plugin.version>3.8.2</android.plugin.version>
-	</properties>
+	<description>THis app is mainly meant as sample code for using libISOBlue</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
-			<version>${platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.isoblue</groupId>
 			<artifactId>libisoblue-aar</artifactId>
-			<version>${project.version}</version>
 			<type>aar</type>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
+		<sourceDirectory>src</sourceDirectory>
 
 		<plugins>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<configuration>
-					<sdk>
-						<platform>19</platform>
-					</sdk>
-					<mergeManifests>true</mergeManifests>
-				</configuration>
 			</plugin>
 		</plugins>
 
@@ -58,8 +46,6 @@
 				<plugin>
 					<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 					<artifactId>android-maven-plugin</artifactId>
-					<version>${android.plugin.version}</version>
-					<extensions>true</extensions>
 				</plugin>
 
 				<plugin>
@@ -71,15 +57,9 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											com.jayway.maven.plugins.android.generation2
-										</groupId>
-										<artifactId>
-											android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[3.8.2,)
-										</versionRange>
+										<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+										<artifactId>android-maven-plugin</artifactId>
+										<versionRange>[3.8.2,)</versionRange>
 										<goals>
 											<goal>consume-aar</goal>
 										</goals>

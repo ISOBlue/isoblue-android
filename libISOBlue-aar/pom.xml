@@ -18,22 +18,33 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.isoblue</groupId>
 			<artifactId>libisoblue</artifactId>
-			<version>${project.version}</version>
 			<type>apklib</type>
-			<scope>import</scope>
 		</dependency>
 	</dependencies>
 	
 	<build>
+		<sourceDirectory>src</sourceDirectory>
+
 		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>android-maven-plugin</artifactId>
+			</plugin>
+
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
-						<phase>validate</phase>
+						<phase>initialize</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -44,9 +55,6 @@
 									<directory>${project.parent.basedir}/libISOBlue</directory>
 									<includes>
 										<include>AndroidManifest.xml</include>
-										<include>assests/**</include>
-										<include>res/**</include>
-										<include>src/**</include>
 									</includes>
 								</resource>
 							</resources>
@@ -63,9 +71,6 @@
 							<directory>${basedir}</directory>
 							<includes>
 								<include>AndroidManifest.xml</include>
-								<include>assets/**</include>
-								<include>res/**</include>
-								<include>src/**</include>
 							</includes>
 						</fileset>
 					</filesets>

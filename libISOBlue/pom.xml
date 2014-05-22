@@ -16,17 +16,10 @@
 	<name>libISOBlue APKLIB</name>
 	<description>Android library for using an ISOBlue device to connect to an ISOBUS network.</description>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<platform.version>4.1.1.4</platform.version>
-		<android.plugin.version>3.8.2</android.plugin.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
-			<version>${platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -38,27 +31,14 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<version>${android.plugin.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<sdk>
-						<platform>19</platform>
-					</sdk>
-				</configuration>
 			</plugin>
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
 			</plugin>
 
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
 			</plugin>
 
 			<plugin>
