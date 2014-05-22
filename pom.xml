@@ -20,6 +20,7 @@
 	<modules>
 		<module>libISOBlue</module>
 		<module>libISOBlue-aar</module>
+		<module>libISOBlue-example</module>
 	</modules>
 
 	<scm>
