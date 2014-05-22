@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.isoblue</groupId>
+		<artifactId>isoblue-android</artifactId>
+		<version>1.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>libisoblue-aar</artifactId>
+	<packaging>aar</packaging>
+
+	<name>libISOBlue AAR</name>
+	<description>Android library for using an ISOBlue device to connect to an ISOBUS network.</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.isoblue</groupId>
+			<artifactId>libisoblue</artifactId>
+			<version>${project.version}</version>
+			<type>apklib</type>
+			<scope>import</scope>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.parent.basedir}/libISOBlue</directory>
+									<includes>
+										<include>AndroidManifest.xml</include>
+										<include>assests/**</include>
+										<include>res/**</include>
+										<include>src/**</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${basedir}</directory>
+							<includes>
+								<include>AndroidManifest.xml</include>
+								<include>assets/**</include>
+								<include>res/**</include>
+								<include>src/**</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

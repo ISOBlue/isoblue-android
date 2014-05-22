@@ -13,12 +13,13 @@
 	<artifactId>libisoblue</artifactId>
 	<packaging>apklib</packaging>
 
-	<name>libISOBlue</name>
+	<name>libISOBlue APKLIB</name>
+	<description>Android library for using an ISOBlue device to connect to an ISOBUS network.</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<platform.version>4.1.1.4</platform.version>
-		<android.plugin.version>3.6.0</android.plugin.version>
+		<android.plugin.version>3.8.2</android.plugin.version>
 	</properties>
 
 	<dependencies>
@@ -32,6 +33,7 @@
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+
 		<plugins>
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
@@ -44,6 +46,7 @@
 					</sdk>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
@@ -52,10 +55,12 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -70,6 +75,7 @@
 							<executable>${basedir}/git_version.sh</executable>
 						</configuration>
 					</execution>
+
 					<execution>
 						<id>git-version-clean</id>
 						<phase>clean</phase>
@@ -102,6 +108,26 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
+										<groupId>
+											com.jayway.maven.plugins.android.generation2
+										</groupId>
+										<artifactId>
+											android-maven-plugin
+										</artifactId>
+										<versionRange>
+											[3.8.2,)
+										</versionRange>
+										<goals>
+											<goal>consume-aar</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+
+								<pluginExecution>
+									<pluginExecutionFilter>
 										<groupId>org.codehaus.mojo</groupId>
 										<artifactId>exec-maven-plugin</artifactId>
 										<versionRange>[1.0.0,)</versionRange>
@@ -115,6 +141,7 @@
 										</execute>
 									</action>
 								</pluginExecution>
+
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
