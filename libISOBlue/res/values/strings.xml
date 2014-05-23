@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="hello">Hello libisoblue!</string>
+    <string name="lib_name">libisoblue</string>
     <string name="app_name">ISOBlue</string>
 
 </resources>
