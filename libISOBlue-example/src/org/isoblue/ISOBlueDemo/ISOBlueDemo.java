@@ -395,7 +395,8 @@ public class ISOBlueDemo extends Activity {
     }
 
     private void postMessage(String bus, org.isoblue.isobus.Message m) {
-        new PostTask().execute(bus, Short.toString(m.getDestAddr()),
+        new PostTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bus,
+                Short.toString(m.getDestAddr()),
                 Short.toString(m.getSrcAddr()), Arrays.toString(m.getData()),
                 Long.toString(m.getTimeStamp()));
     }
