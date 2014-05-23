@@ -27,7 +27,6 @@
 		<url>htttps://github.com/ISOBlue/isoblue-android/</url>
 		<connection>scm:git:git://github.com/ISOBlue/isoblue-android.git</connection>
 		<developerConnection>scm:git:git@github.com:ISOBlue/isoblue-android.git</developerConnection>
-		<tag>maven</tag>
 	</scm>
 
 	<developers>
