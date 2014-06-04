@@ -22,6 +22,11 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/insecure_connect"/>
     <item
+        android:id="@+id/get_past_data"
+        android:showAsAction="never"
+        android:checkable="true"
+        android:title="@string/get_past_data"/>
+    <item
         android:id="@+id/select_pgns"
         android:showAsAction="ifRoom|withText"
         android:title="@string/select_pgns"/>

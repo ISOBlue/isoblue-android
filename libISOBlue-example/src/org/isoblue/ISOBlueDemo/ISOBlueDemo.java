@@ -106,6 +106,8 @@ public class ISOBlueDemo extends Activity {
     private SQLiteOpenHelper mHelper;
     private SQLiteDatabase mDatabase;
 
+    private boolean mPast;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -328,7 +330,7 @@ public class ISOBlueDemo extends Activity {
             // When DeviceListActivity returns with a device to connect
             if (resultCode == Activity.RESULT_OK) {
                 try {
-                    connectDevice(data);
+                    connectDevice(data, mPast);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -353,7 +355,7 @@ public class ISOBlueDemo extends Activity {
         }
     }
 
-    private void connectDevice(Intent data) throws IOException,
+    private void connectDevice(Intent data, boolean past) throws IOException,
             InterruptedException {
         // Get the device MAC address
         String address = data.getExtras().getString(
@@ -361,7 +363,7 @@ public class ISOBlueDemo extends Activity {
         // Get the BluetoothDevice object
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
-        mChatService.connect(device);
+        mChatService.connect(device, past);
     }
 
     @Override
@@ -379,6 +381,11 @@ public class ISOBlueDemo extends Activity {
             // Launch the DeviceListActivity to see devices and do scan
             serverIntent = new Intent(this, DeviceListActivity.class);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+            return true;
+
+        case R.id.get_past_data:
+            mPast = !item.isChecked();
+            item.setChecked(mPast);
             return true;
 
         case R.id.select_pgns:

@@ -49,6 +49,8 @@ public class BluetoothService {
     private ConnectedThread mBufEngConnectedThread, mBufImpConnectedThread;
     private int mState;
 
+    private boolean mPast;
+
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0; // we're doing nothing
     public static final int STATE_LISTEN = 1; // now listening for incoming
@@ -122,12 +124,13 @@ public class BluetoothService {
      * 
      * @param device
      *            The BluetoothDevice to connect
+     * @param past
      * @param secure
      *            Socket Security type - Secure (true) , Insecure (false)
      * @throws InterruptedException
      * @throws IOException
      */
-    public synchronized void connect(BluetoothDevice device)
+    public synchronized void connect(BluetoothDevice device, boolean past)
             throws IOException, InterruptedException {
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING) {
@@ -146,6 +149,8 @@ public class BluetoothService {
             mImpConnectedThread.cancel();
             mImpConnectedThread = null;
         }
+
+        mPast = past;
 
         // Start the thread to connect with the given device
         try {
@@ -189,14 +194,20 @@ public class BluetoothService {
         }
 
         // Start the thread to manage the connection and perform transmissions
-        mEngConnectedThread = new ConnectedThread(engSocket, ISOBlueDemo.MESSAGE_ARG1_NEW);
+        mEngConnectedThread = new ConnectedThread(engSocket,
+                ISOBlueDemo.MESSAGE_ARG1_NEW);
         mEngConnectedThread.start();
-        mImpConnectedThread = new ConnectedThread(impSocket, ISOBlueDemo.MESSAGE_ARG1_NEW);
+        mImpConnectedThread = new ConnectedThread(impSocket,
+                ISOBlueDemo.MESSAGE_ARG1_NEW);
         mImpConnectedThread.start();
-        mBufEngConnectedThread = new ConnectedThread(bufEngSocket, ISOBlueDemo.MESSAGE_ARG1_BUF);
-        mBufEngConnectedThread.start();
-        mBufImpConnectedThread = new ConnectedThread(bufImpSocket, ISOBlueDemo.MESSAGE_ARG1_BUF);
-        mBufImpConnectedThread.start();
+        if (mPast) {
+            mBufEngConnectedThread = new ConnectedThread(bufEngSocket,
+                    ISOBlueDemo.MESSAGE_ARG1_BUF);
+            mBufEngConnectedThread.start();
+            mBufImpConnectedThread = new ConnectedThread(bufImpSocket,
+                    ISOBlueDemo.MESSAGE_ARG1_BUF);
+            mBufImpConnectedThread.start();
+        }
 
         // Send the name of the connected device back to the UI Activity
         Message msg = mHandler.obtainMessage(ISOBlueDemo.MESSAGE_DEVICE_NAME);
@@ -307,10 +318,12 @@ public class BluetoothService {
                 mmImpSocket = new ISOBUSSocket(mmDevice.getImplementBus(),
                         null, pgns);
 
-                ISOBUSSocket[] bufSocks = mmDevice
-                        .createBufferedISOBUSSockets(0);
-                mmBufEngSocket = bufSocks[0];
-                mmBufImpSocket = bufSocks[1];
+                if (mPast) {
+                    ISOBUSSocket[] bufSocks = mmDevice
+                            .createBufferedISOBUSSockets(0);
+                    mmBufEngSocket = bufSocks[0];
+                    mmBufImpSocket = bufSocks[1];
+                }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
