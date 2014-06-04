@@ -48,6 +48,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -370,6 +371,8 @@ public class ISOBlueDemo extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
+        
+        setPastData(menu.findItem(R.id.get_past_data).isChecked());
         return true;
     }
 
@@ -384,8 +387,10 @@ public class ISOBlueDemo extends Activity {
             return true;
 
         case R.id.get_past_data:
-            mPast = !item.isChecked();
-            item.setChecked(mPast);
+            // Toggle
+            item.setChecked(!item.isChecked());
+            // Update accordingly
+            setPastData(item.isChecked());
             return true;
 
         case R.id.select_pgns:
@@ -399,6 +404,17 @@ public class ISOBlueDemo extends Activity {
             break;
         }
         return false;
+    }
+
+    private void setPastData(boolean past) {
+        mPast = past;
+
+        // Update views accordingly
+        if (mPast) {
+            findViewById(R.id.buf_view).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.buf_view).setVisibility(View.GONE);
+        }
     }
 
     private void postMessage(String bus, org.isoblue.isobus.Message m) {

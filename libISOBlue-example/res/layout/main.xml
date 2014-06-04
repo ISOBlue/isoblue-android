@@ -15,73 +15,107 @@
      limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
     android:baselineAligned="false"
-    android:orientation="horizontal" >
+    android:orientation="vertical" >
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:id="@+id/cur_view"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
         android:layout_weight="1"
         android:baselineAligned="false"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/eng_list_title" />
-
-        <ListView
-            android:id="@+id/eng"
-            android:layout_width="fill_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:transcriptMode="alwaysScroll" />
+            android:baselineAligned="false"
+            android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/buf_eng_list_title" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/eng_list_title" />
 
-        <ListView
-            android:id="@+id/buf_eng"
-            android:layout_width="fill_parent"
+            <ListView
+                android:id="@+id/eng"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:transcriptMode="alwaysScroll" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:transcriptMode="alwaysScroll" />
+            android:baselineAligned="false"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/imp_list_title" />
+
+            <ListView
+                android:id="@+id/imp"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:transcriptMode="alwaysScroll" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:id="@+id/buf_view"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
         android:layout_weight="1"
         android:baselineAligned="false"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/imp_list_title" />
-
-        <ListView
-            android:id="@+id/imp"
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:transcriptMode="alwaysScroll" />
+            android:baselineAligned="false"
+            android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/buf_imp_list_title" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/buf_eng_list_title" />
 
-        <ListView
-            android:id="@+id/buf_imp"
+            <ListView
+                android:id="@+id/buf_eng"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:transcriptMode="alwaysScroll" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:transcriptMode="alwaysScroll" />
+            android:baselineAligned="false"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/buf_imp_list_title" />
+
+            <ListView
+                android:id="@+id/buf_imp"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:transcriptMode="alwaysScroll" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
