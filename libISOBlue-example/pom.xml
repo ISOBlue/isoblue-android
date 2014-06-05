@@ -27,6 +27,11 @@
 			<artifactId>libisoblue-aar</artifactId>
 			<type>aar</type>
 		</dependency>
+		<dependency>
+			<groupId>com.mcxiaoke.volley</groupId>
+			<artifactId>library</artifactId>
+			<type>aar</type>
+		</dependency>
 	</dependencies>
 
 	<build>

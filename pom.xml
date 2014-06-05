@@ -88,6 +88,13 @@
 				<version>${project.version}</version>
 				<type>aar</type>
 			</dependency>
+
+			<dependency>
+				<groupId>com.mcxiaoke.volley</groupId>
+				<artifactId>library</artifactId>
+				<version>1.0.4</version>
+				<type>aar</type>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

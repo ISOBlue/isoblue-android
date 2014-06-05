@@ -17,18 +17,7 @@
 package org.isoblue.ISOBlueDemo;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
@@ -40,7 +29,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -54,6 +42,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.authorwjf.AboutDialog;
 
 /**
@@ -109,6 +99,9 @@ public class ISOBlueDemo extends Activity {
 
     private boolean mPast;
 
+    // Volley queue
+    private RequestQueue mRequestQueue;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +126,7 @@ public class ISOBlueDemo extends Activity {
 
         mHelper = new ISOBUSOpenHelper(this.getApplicationContext());
         mDatabase = mHelper.getWritableDatabase();
+        mRequestQueue = Volley.newRequestQueue(getApplicationContext());
     }
 
     @Override
@@ -371,7 +365,7 @@ public class ISOBlueDemo extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.option_menu, menu);
-        
+
         setPastData(menu.findItem(R.id.get_past_data).isChecked());
         return true;
     }
@@ -418,57 +412,8 @@ public class ISOBlueDemo extends Activity {
     }
 
     private void postMessage(String bus, org.isoblue.isobus.Message m) {
-        new PostTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, bus,
-                Short.toString(m.getDestAddr()),
-                Short.toString(m.getSrcAddr()), Arrays.toString(m.getData()),
-                Long.toString(m.getTimeStamp()));
-    }
-
-    // Acquired from Cyrus
-    private void postData(String bus, String dest, String src, String data,
-            String time) {
-        // Create a new HttpClient and Post Header
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(
-                "https://docs.google.com/forms/d/1mszF-1Dvk18ajb6WhP22ctkDqizNI9-wMjylDznPKjs/formResponse");
-
-        try {
-            // Add your data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("entry.2120486804", bus));
-            nameValuePairs.add(new BasicNameValuePair("entry.363860839", dest));
-            nameValuePairs.add(new BasicNameValuePair("entry.80712516", src));
-            nameValuePairs
-                    .add(new BasicNameValuePair("entry.1759126747", data));
-            nameValuePairs.add(new BasicNameValuePair("entry.478698627", time));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    private class PostTask extends AsyncTask<String, Void, Void> {
-        @Override
-        protected Void doInBackground(String... params) {
-            postData(params[0], params[1], params[2], params[3], params[4]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            // This is executed on ui thread
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            // This is executed on ui thread
-        }
+        mRequestQueue.add(new MessagePostRequest(bus, Short.toString(m
+                .getDestAddr()), Short.toString(m.getSrcAddr()), Arrays
+                .toString(m.getData()), Long.toString(m.getTimeStamp())));
     }
 }
