@@ -16,4 +16,8 @@ jdk:
     - oraclejdk7
     - openjdk7
 
-script: mvn clean package
+install: mvn dependency:resolve dependency:resolve-plugins
+
+before_script: mvn clean
+
+script: mvn package
